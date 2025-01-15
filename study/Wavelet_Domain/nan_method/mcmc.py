@@ -2,6 +2,7 @@ import os
 
 from gap_study_utils.constants import F_TRUE
 from gap_study_utils.mcmc_runner import run_mcmc
+from gap_study_utils.constants import A_TRUE, LN_F_TRUE, LN_FDOT_TRUE
 
 OUTDIR = "out_mcmc"
 os.makedirs(OUTDIR, exist_ok=True)
@@ -16,9 +17,10 @@ GAPS = [
 common_kwgs = dict(
     n_iter=NITER,
     alpha=0.0,
-    highpass_fmin=0.0,# * F_TRUE / 4,
+    highpass_fmin=None,# * F_TRUE / 4,
     dt=DT,
     tmax=TMAX,
+    frange=[0.002, 0.007]
 )
 
 
@@ -29,18 +31,29 @@ if __name__ == "__main__":
     #     outdir=f"{OUTDIR}/gap+noise",
     #     **common_kwgs
     # )
+
+
     run_mcmc(
         gap_ranges=None,
         noise_realisation=True,
         outdir=f"{OUTDIR}/noise",
+        true_params=[A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
         **common_kwgs
     )
+    # run_mcmc(
+    #     gap_ranges=None,
+    #     noise_realisation=True,
+    #     outdir=f"{OUTDIR}/lower_noise",
+    #     true_params=[A_TRUE*10,LN_F_TRUE, LN_FDOT_TRUE],
+    #     **common_kwgs
+    # )
     # run_mcmc(
     #     gap_ranges=None,
     #     noise_realisation=False,
     #     outdir=f"{OUTDIR}/basic",
     #     **common_kwgs,
     # )
+
     # run_mcmc(
     #     gap_ranges=GAPS,
     #     noise_realisation=False,

@@ -6,6 +6,7 @@ from typing import List
 
 import arviz as az
 import emcee
+import numpy as np
 from bilby.core.prior import Gaussian, PriorDict, TruncatedGaussian, Uniform
 
 from .analysis_data import AnalysisData
@@ -23,15 +24,16 @@ PRIOR = PriorDict(
     )
 )
 
-CENTERED_PRIOR = PriorDict(
-    dict(
+
+
+def generate_centered_prior(a, ln_f, ln_fdot):
+    return PriorDict(dict(
         a=TruncatedGaussian(
-            mu=A_TRUE, sigma=A_SCALE * 0.1, minimum=1e-25, maximum=1e-15
+            mu=a, sigma=a*0.1, minimum=min(A_RANGE) , maximum=max(A_RANGE)
         ),
-        ln_f=Gaussian(mu=LN_F_TRUE, sigma=LN_F_SCALE * 0.1),
-        ln_fdot=Gaussian(mu=LN_FDOT_TRUE, sigma=LN_FDOT_SCALE * 0.1),
-    )
-)
+        ln_f=Gaussian(mu=ln_f, sigma=LN_F_SCALE * 0.1),
+        ln_fdot=Gaussian(mu=ln_fdot, sigma=LN_FDOT_SCALE * 0.1),
+    ))
 
 
 def log_prior(theta):
@@ -64,7 +66,8 @@ def run_mcmc(
     tmax=TMAX,
     dt=DT,
     alpha=0.0,
-    highpass_fmin=10**-4,
+    highpass_fmin=None,
+    frange=None,
     noise_realisation=False,
     n_iter=2500,
     nwalkers=32,
@@ -98,6 +101,7 @@ def run_mcmc(
             noise=noise_realisation,
             tmax=tmax,
             highpass_fmin=highpass_fmin,
+            frange=frange,
             alpha=alpha,
             Nf=Nf,
         ),
@@ -107,7 +111,15 @@ def run_mcmc(
         plotfn=f"{outdir}/data.png",
     )
 
-    x0 = sample_prior(PRIOR, nwalkers)  # Starting coordinates
+    if true_params:
+        # check that the true parameters are within the prior
+        for key, val in zip(PRIOR.keys(), true_params):
+            if PRIOR.ln_prob({key: val}) == -np.inf:
+                raise ValueError(f"True parameter {key}={val} is not within the prior")
+
+    centered_prior = generate_centered_prior(*true_params)
+    x0 = sample_prior(centered_prior, nwalkers)  # Starting coordinates
+    print(f"Starting coordinates: {np.median(x0, axis=0)}, true values: {true_params}")
     nwalkers, ndim = x0.shape
 
     # Check likelihood
@@ -157,7 +169,7 @@ def run_mcmc(
     print("Making plots")
     plot_corner(idata_fname, trues=true_params, fname=f"{outdir}/corner.png")
     plot_mcmc_summary(
-        idata_fname, analysis_data, fname=f"{outdir}/summary.png"
+        idata_fname, analysis_data, fname=f"{outdir}/summary.png", frange=frange, extra_info=f"SNR={analysis_data.snr_dict['matched_filter_snr']:.2f}"
     )
     print(f"Runtime: {_fmt_rutime(float(idata.sample_stats.runtime))}")
 

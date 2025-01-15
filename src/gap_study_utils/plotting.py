@@ -6,12 +6,11 @@ import numpy as np
 from tqdm.auto import trange
 
 from gap_study_utils.analysis_data import AnalysisData
-from gap_study_utils.constants import TRUES
 
 gif.options.matplotlib["dpi"] = 100
 
 
-def plot_trace(idata: az.InferenceData, axes, i=None, max_iter=None):
+def plot_trace(idata: az.InferenceData, axes, i=None, max_iter=None, trues=None):
     if i is not None:
         sliced_posterior = idata.posterior.isel(
             chain=slice(None), draw=slice(0, i)
@@ -21,10 +20,10 @@ def plot_trace(idata: az.InferenceData, axes, i=None, max_iter=None):
     az.plot_trace(idata, axes=axes)
     for row in range(3):
         axes[row, 0].axvline(
-            TRUES[row], c="red", linestyle="--", label="truth"
+            trues[row], c="red", linestyle="--", label="truth"
         )
         axes[row, 1].axhline(
-            TRUES[row], c="red", linestyle="--", label="truth"
+            trues[row], c="red", linestyle="--", label="truth"
         )
         if i is not None:
             axes[row, 1].axvline(i, c="green", linestyle="--")
@@ -38,7 +37,7 @@ def _trace_mcmc_frame(idata, analysis_data: AnalysisData, i, max_iter=None):
     plot_mcmc_summary(idata, analysis_data, max_iter)
 
 
-def plot_mcmc_summary(idata, analysis_data: AnalysisData, i=None, fname=None):
+def plot_mcmc_summary(idata, analysis_data: AnalysisData, i=None, fname=None, frange=None, extra_info=""):
     if isinstance(idata, str):
         idata = az.from_netcdf(idata)
 
@@ -51,8 +50,8 @@ def plot_mcmc_summary(idata, analysis_data: AnalysisData, i=None, fname=None):
     htemplate = analysis_data.htemplate(**ith_samp)
 
     fig, axes = plt.subplots(4, 2, figsize=(10, 10))
-    fig.suptitle(f"Iteration {i}")
-    plot_trace(idata, axes, i, max_iter)
+    fig.suptitle(f"Iteration {i}" + f" [{extra_info}]")
+    plot_trace(idata, axes, i, max_iter, trues=analysis_data.waveform_parameters)
     analysis_data.data_wavelet.plot(
         ax=axes[3, 0],
         show_colorbar=False,
@@ -68,6 +67,11 @@ def plot_mcmc_summary(idata, analysis_data: AnalysisData, i=None, fname=None):
         absolute=True,
         zscale="log",
     )
+    if frange:
+        axes[3, 0].axhline(frange[0], c="red", linestyle="--")
+        axes[3, 0].axhline(frange[1], c="red", linestyle="--")
+        axes[3, 1].axhline(frange[0], c="red", linestyle="--")
+        axes[3, 1].axhline(frange[1], c="red", linestyle="--")
     if fname:
         plt.tight_layout()
         plt.savefig(fname)
@@ -85,7 +89,7 @@ def make_mcmc_trace_gif(
     gif.save(trace_frames, fname, duration=100)
 
 
-def plot_corner(idata_fname, trues=TRUES, fname="corner.png"):
+def plot_corner(idata_fname, trues=None, fname="corner.png"):
     idata = az.from_netcdf(idata_fname)
     # discard burn-in
     burnin = 0.5

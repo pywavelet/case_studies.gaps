@@ -2,7 +2,7 @@ import numpy as np
 
 ONE_HOUR = 60 * 60
 ONE_DAY = 24 * ONE_HOUR
-A_TRUE = 1e-21
+A_TRUE = 1e-20
 F_TRUE = 3e-3
 FDOT_TRUE = 1e-8
 DT = np.floor(0.1 / (2 * F_TRUE))
@@ -21,7 +21,7 @@ GAP_RANGES = [
     [0.8 * TMAX, 0.87 * TMAX],
 ]
 
-A_RANGE = [A_TRUE - 1e-21, A_TRUE + 1e-21]
+A_RANGE = [1e-25, 1e-17]
 F_RANGE = [F_TRUE - 6e-7, F_TRUE + 6e-7]
 FDOT_RANGE = [FDOT_TRUE - 6e-12, FDOT_TRUE + 6e-12]
 

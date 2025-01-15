@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 from pywavelet.transforms.forward.wavelet_bins import compute_bins
-from pywavelet.transforms.types import FrequencySeries, TimeSeries, Wavelet
+from pywavelet.transforms.types import FrequencySeries, TimeSeries, Wavelet, WaveletMask
 from pywavelet.utils import (
     compute_likelihood,
     compute_snr,
@@ -32,7 +32,8 @@ class AnalysisData:
             "dt": DT,
             "tmax": TMAX,
             "alpha": 0.0,
-            "highpass_fmin": 0,
+            "highpass_fmin": None,
+            "frange": None,
             "noise": False,
         }
         gap_kwargs = {
@@ -56,7 +57,6 @@ class AnalysisData:
         self.data_kwargs = data_kwargs or {}
         self.gap_kwargs = gap_kwargs or {}
 
-        breakpoint()
         self.waveform_generator = waveform_generator
         self.waveform_parameters = waveform_parameters
         self._initialize_data_params()
@@ -71,7 +71,8 @@ class AnalysisData:
         self.dt = self.data_kwargs.get("dt", DT)
         self.tmax = self.data_kwargs.get("tmax", TMAX)
         self.alpha = self.data_kwargs.get("alpha", 0.0)
-        self.highpass_fmin = self.data_kwargs.get("highpass_fmin", 0)
+        self.highpass_fmin = self.data_kwargs.get("highpass_fmin", None)
+        self.frange = self.data_kwargs.get("frange", None)
         self.noise = self.data_kwargs.get("noise", False)
         self.ND = int(self.tmax / self.dt)
         self.time = np.arange(0, self.tmax, self.dt)
@@ -82,6 +83,12 @@ class AnalysisData:
         self.Nf = self.data_kwargs.get("Nf", NF)
         self.Nt = self.ND // self.Nf
         self.t_grid, self.f_grid = compute_bins(self.Nf, self.Nt, self.tmax)
+        # make a mask -- only use f_grid within the frange
+        if self.frange is None:
+            self.frange = [0, self.freq[-1]]
+
+        # make a mask -- only use f_grid within the frange
+        self.mask = WaveletMask.from_frange(time_grid=self.t_grid, freq_grid=self.f_grid, frange=self.frange)
 
     def _initialize_gap_window(self):
         """Set up the gap window if `gap_kwargs` are provided."""
@@ -208,7 +215,7 @@ class AnalysisData:
         """Apply gap windowing and high-pass filtering to data time series and compute wavelet."""
         if not hasattr(self, "__data_wavelet"):
             data_timeseries = self.data_timeseries
-            if self.highpass_fmin > 0:
+            if self.highpass_fmin:
                 data_timeseries = data_timeseries.highpass_filter(
                     fmin=self.highpass_fmin, tukey_window_alpha=self.alpha
                 )
@@ -218,17 +225,19 @@ class AnalysisData:
                 else self.gaps.gap_n_transform_timeseries(
                     data_timeseries, self.Nf, self.alpha, self.highpass_fmin
                 )
-            ) 
+            )
         return self.__data_wavelet
 
     @property
     def summary_dict(self) -> Dict[str, float]:
         """Summary dictionary of analysis metrics, including signal-to-noise ratios (SNR)."""
         if not hasattr(self, "__summary_dict"):
+            windowed = self.highpass_fmin is not None and self.highpass_fmin > 0
+
             self.__summary_dict = dict(
                 ht=self.ht,
                 gaps=self.gaps,
-                windowed=self.highpass_fmin > 0,
+                windowed= windowed,
                 noise=self.noise,
                 **self.snr_dict,
             )
@@ -293,7 +302,9 @@ class AnalysisData:
 
         self.hf.plot_periodogram(ax=ax[1], color="C0", alpha=1, lw=1)
         self.psd_freqseries.plot(ax=ax[1], color="k", alpha=1, lw=1)
-        ax[1].set_xlim(left=self.highpass_fmin, right=self.freq[-1])
+        if self.highpass_fmin:
+            ax[1].set_xlim(left=self.highpass_fmin)
+        ax[1].set_xlim(right=self.freq[-1])
         ax[1].tick_params(
             axis="x",
             direction="in",
@@ -307,6 +318,10 @@ class AnalysisData:
         kwgs2 = dict(whiten_by=self.psd.data, **kwgs)
         self.data_wavelet.plot(ax=ax[3], label="Data\n", **kwgs2)
         self.hwavelet.plot(ax=ax[4], label="Model\n", **kwgs2)
+        if self.frange:
+            ax[4].axhline(self.frange[0], color="r", linestyle="--")
+            ax[4].axhline(self.frange[1], color="r", linestyle="--")
+
         self.psd.plot(ax=ax[5], label="PSD\n", **kwgs)
         if self.gaps:
             if self.gaps.type == GapType.STITCH:
@@ -331,13 +346,12 @@ class AnalysisData:
                 ht, self.Nf, self.alpha, self.highpass_fmin
             )
         else:
-            if self.highpass_fmin > 0:
+            if self.highpass_fmin:
                 ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
             hwavelet = ht.to_wavelet(Nf=self.Nf)
         return hwavelet
 
     def lnl(self, *args) -> float:
-        breakpoint()
         return compute_likelihood(
-            self.data_wavelet, self.htemplate(*args), self.psd
+            self.data_wavelet, self.htemplate(*args), self.psd, self.mask
         )
