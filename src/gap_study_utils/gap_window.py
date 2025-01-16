@@ -3,9 +3,9 @@ from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pywavelet.transforms.forward.wavelet_bins import compute_bins
-from pywavelet.transforms.types import TimeSeries, Wavelet
-from pywavelet.transforms.types.plotting import _fmt_time_axis
+from pywavelet.types.wavelet_bins import compute_bins
+from pywavelet.types import TimeSeries, Wavelet
+from pywavelet.types.plotting import _fmt_time_axis
 
 
 class GapType(Enum):

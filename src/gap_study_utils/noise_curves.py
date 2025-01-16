@@ -1,7 +1,7 @@
 from typing import Union
 
 import numpy as np
-from pywavelet.transforms.types import FrequencySeries, TimeSeries
+from pywavelet.types import FrequencySeries, TimeSeries
 
 from .random import rng
 

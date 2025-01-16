@@ -5,7 +5,7 @@ from typing import List
 
 import numpy as np
 from numba import njit, prange
-from pywavelet.transforms.types import TimeSeries, Wavelet
+from pywavelet.types import TimeSeries, Wavelet
 from scipy.signal.windows import tukey
 
 ONE_HOUR = 60 * 60

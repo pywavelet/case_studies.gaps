@@ -2,8 +2,8 @@ from typing import Callable, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pywavelet.transforms.forward.wavelet_bins import compute_bins
-from pywavelet.transforms.types import FrequencySeries, TimeSeries, Wavelet, WaveletMask
+from pywavelet.types.wavelet_bins import compute_bins
+from pywavelet.types import FrequencySeries, TimeSeries, Wavelet, WaveletMask
 from pywavelet.utils import (
     compute_likelihood,
     compute_snr,
@@ -89,6 +89,7 @@ class AnalysisData:
 
         # make a mask -- only use f_grid within the frange
         self.mask = WaveletMask.from_frange(time_grid=self.t_grid, freq_grid=self.f_grid, frange=self.frange)
+        self.zero_wavelet = Wavelet.zeros_from_grid(self.t_grid, self.f_grid)
 
     def _initialize_gap_window(self):
         """Set up the gap window if `gap_kwargs` are provided."""
@@ -354,4 +355,9 @@ class AnalysisData:
     def lnl(self, *args) -> float:
         return compute_likelihood(
             self.data_wavelet, self.htemplate(*args), self.psd, self.mask
+        )
+
+    def noise_lnl(self, *args) -> float:
+        return compute_likelihood(
+            self.data_wavelet,self.zero_wavelet, self.psd, self.mask
         )

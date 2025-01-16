@@ -16,9 +16,11 @@ from .plotting import plot_corner, plot_mcmc_summary
 from .random import seed
 from .signal_utils import waveform
 
+from .utils import _fmt_rutime
+
 PRIOR = PriorDict(
     dict(
-        a=Uniform(*A_RANGE),
+        ln_a=Uniform(*LN_A_RANGE),
         ln_f=Uniform(*LN_F_RANGE),
         ln_fdot=Uniform(*LN_FDOT_RANGE),
     )
@@ -26,19 +28,17 @@ PRIOR = PriorDict(
 
 
 
-def generate_centered_prior(a, ln_f, ln_fdot):
+def generate_centered_prior(ln_a, ln_f, ln_fdot):
     return PriorDict(dict(
-        a=TruncatedGaussian(
-            mu=a, sigma=a*0.1, minimum=min(A_RANGE) , maximum=max(A_RANGE)
-        ),
+        ln_a=Gaussian(mu=ln_a, sigma=LN_A_SCALE * 0.1),
         ln_f=Gaussian(mu=ln_f, sigma=LN_F_SCALE * 0.1),
         ln_fdot=Gaussian(mu=ln_fdot, sigma=LN_FDOT_SCALE * 0.1),
     ))
 
 
 def log_prior(theta):
-    a, ln_f, ln_fdot = theta
-    _lnp = PRIOR.ln_prob(dict(a=a, ln_f=ln_f, ln_fdot=ln_fdot))
+    ln_a, ln_f, ln_fdot = theta
+    _lnp = PRIOR.ln_prob(dict(ln_a=ln_a, ln_f=ln_f, ln_fdot=ln_fdot))
     if not np.isfinite(_lnp):
         return -np.inf
     else:
@@ -60,7 +60,7 @@ def log_posterior(theta: List[float], analysis_data: AnalysisData) -> float:
 
 
 def run_mcmc(
-    true_params=[A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
+    true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
     gap_ranges=GAP_RANGES,
     Nf=NF,
     tmax=TMAX,
@@ -174,14 +174,3 @@ def run_mcmc(
     print(f"Runtime: {_fmt_rutime(float(idata.sample_stats.runtime))}")
 
 
-def _fmt_rutime(t: float):
-    hours, remainder = divmod(t, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    fmt = ""
-    if hours:
-        fmt += f"{int(hours)}h"
-    if minutes:
-        fmt += f"{int(minutes)}m"
-    if seconds:
-        fmt += f"{int(seconds)}s"
-    return fmt

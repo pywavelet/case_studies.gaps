@@ -3,12 +3,9 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pywavelet.transforms import (
-    from_freq_to_wavelet,
-    from_time_to_wavelet,
-    from_wavelet_to_time,
-)
-from pywavelet.transforms.types import FrequencySeries, TimeSeries
+from pywavelet.transforms import from_freq_to_wavelet
+
+from pywavelet.transforms.types import FrequencySeries
 from pywavelet.transforms.types.plotting import plot_wavelet_grid
 from pywavelet.utils import evolutionary_psd_from_stationary_psd
 from scipy.signal.windows import tukey
