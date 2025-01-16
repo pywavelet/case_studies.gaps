@@ -1,7 +1,22 @@
 # CHANGELOG
 
 
+## v0.1.0 (2025-01-16)
+
+### Unknown
+
+* Merge branch 'main' of github.com:pywavelet/case_studies.gaps into main ([`c53e3eb`](https://github.com/pywavelet/case_studies.gaps/commit/c53e3eb5634ed46a0bb459da19a3814cb9d3bdb8))
+
+
 ## v0.0.4 (2025-01-15)
+
+### Chores
+
+* chore(release): 0.0.4 ([`8801219`](https://github.com/pywavelet/case_studies.gaps/commit/8801219cc64e0cb3c73419e782431283fcbce64c))
+
+### Features
+
+* feat: add bilby sampler ([`262b4eb`](https://github.com/pywavelet/case_studies.gaps/commit/262b4ebc4824ddcccf69271f779fe582c5f017b4))
 
 ### Unknown
 
