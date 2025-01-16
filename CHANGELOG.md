@@ -1,11 +1,26 @@
 # CHANGELOG
 
 
+## v0.0.4 (2025-01-15)
+
+### Unknown
+
+* Merge branch 'main' of github.com:pywavelet/case_studies.gaps into main ([`fb5526d`](https://github.com/pywavelet/case_studies.gaps/commit/fb5526dcaa2fde817dd75c6ec537a2f957b6c868))
+
+* Update docs.yml ([`0a28a6a`](https://github.com/pywavelet/case_studies.gaps/commit/0a28a6a1057641c548c1a27dde1ce8a6e0c88f0b))
+
+
 ## v0.0.3 (2024-12-12)
 
 ### Bug Fixes
 
+* fix: add frange ([`9acb21e`](https://github.com/pywavelet/case_studies.gaps/commit/9acb21eccfe28a886c48372d1fe9a0054a70c6b4))
+
 * fix: add badges to readme ([`7b8b2b3`](https://github.com/pywavelet/case_studies.gaps/commit/7b8b2b34b56bc7ffe7ec2a7c94b5eec061b2cf17))
+
+### Chores
+
+* chore(release): 0.0.3 ([`7cecccc`](https://github.com/pywavelet/case_studies.gaps/commit/7cecccc115d74626359531091139d971ba3db1b7))
 
 ### Unknown
 
