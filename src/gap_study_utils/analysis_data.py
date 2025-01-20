@@ -377,6 +377,14 @@ class AnalysisData:
             hwavelet = ht.to_wavelet(Nf=self.Nf)
         return hwavelet
 
+    def htemplate_time(self, *args, **kwargs) -> TimeSeries:
+        ht = self.waveform_generator(*args, **kwargs, t=self.time)
+        if self.highpass_fmin:
+            ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
+        if self.gaps is not None:
+            ht.data[self.gaps.gap_bools] = 0
+        return ht
+
     def lnl(self, *args) -> float:
         return compute_likelihood(
             self.data_wavelet, self.htemplate(*args), self.psd, self.mask
@@ -386,3 +394,12 @@ class AnalysisData:
         return compute_likelihood(
             self.data_wavelet,self.zero_wavelet, self.psd, self.mask
         )
+
+
+    def freqdomain_lnl(self, *args) -> float:
+        signal_f = self.htemplate_time(*args).to_frequencyseries().data
+        variance_noise_f = (
+                self.ND * self.psd_freqseries.data / (4 * self.dt)
+        )  # Calculate variance of noise, real and imaginary.
+        inn_prod = sum((abs(self.data_frequencyseries.data - signal_f) ** 2) / variance_noise_f)
+        return -0.5 * inn_prod
