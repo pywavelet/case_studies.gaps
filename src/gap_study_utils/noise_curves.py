@@ -65,7 +65,7 @@ def noise_PSD_AE(f: np.ndarray, TDI="TDI1"):
 
 
 def generate_stationary_noise(
-    ND: int, dt: float, psd: FrequencySeries, time_domain: bool = True
+    ND: int, dt: float, psd: FrequencySeries, time_domain: bool = False
 ) -> Union[TimeSeries, FrequencySeries]:
 
     variance_f = (

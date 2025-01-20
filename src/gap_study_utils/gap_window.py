@@ -175,7 +175,7 @@ class GapWindow:
         chunks = []
         for i, (t0_idx, tend_idx) in enumerate(self.non_gap_idxs()):
             ts = ht[t0_idx:tend_idx].zero_pad_to_power_of_2(alpha)
-            if fmin != 0:
+            if fmin:
                 ts.highpass_filter(fmin, alpha)
             chunks.append(ts)
         return chunks

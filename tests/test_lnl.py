@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from pywavelet.transforms.types import Wavelet
+from pywavelet.types import Wavelet
 
 from gap_study_utils.analysis_data import AnalysisData
 from gap_study_utils.constants import TRUES
@@ -19,8 +19,9 @@ def test_lnl(plot_dir):
     fig.savefig(f"{plot_dir}/lnl.png")
 
     assert data.hwavelet_gapped == template, "Template and hwavelet not equal!"
+    assert np.nansum(hdiff.data) == 0
     lnl = data.lnl(*TRUES)
-    assert lnl == 0, "Lnl not 0 for true params!"
+    assert lnl == 0, "Lnl not 0 for true params!... Lnl = {lnl}"
 
 
 def __plot(hdata, htemplate, lnl, gap, fname):

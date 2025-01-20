@@ -2,6 +2,8 @@ from typing import Callable, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+
 from pywavelet.types.wavelet_bins import compute_bins
 from pywavelet.types import FrequencySeries, TimeSeries, Wavelet, WaveletMask
 from pywavelet.utils import (
@@ -71,7 +73,7 @@ class AnalysisData:
         self.dt = self.data_kwargs.get("dt", DT)
         self.tmax = self.data_kwargs.get("tmax", TMAX)
         self.alpha = self.data_kwargs.get("alpha", 0.0)
-        self.highpass_fmin = self.data_kwargs.get("highpass_fmin", None)
+        self.highpass_fmin = None # self.data_kwargs.get("highpass_fmin", None) HARD CODED
         self.frange = self.data_kwargs.get("frange", None)
         self.noise = self.data_kwargs.get("noise", False)
         self.ND = int(self.tmax / self.dt)
@@ -160,17 +162,39 @@ class AnalysisData:
         return self.__ht
 
     @property
-    def noise_timeseries(self) -> TimeSeries:
-        """Generate stationary noise time series if noise is enabled."""
-        if not hasattr(self, "__noise_timeseries"):
-            self.__noise_timeseries = (
+    def noise_frequencyseries(self) -> FrequencySeries:
+        """Generate stationary noise frequency series if noise is enabled."""
+        if not hasattr(self, "__noise_frequencyseries"):
+            self.__noise_frequencyseries = (
                 generate_stationary_noise(
                     ND=self.ND, dt=self.dt, psd=self.psd_freqseries
                 )
                 if self.noise
+                else FrequencySeries._EMPTY(self.Nf, self.Nt)
+            )
+        return self.__noise_frequencyseries
+
+
+    @property
+    def noise_timeseries(self) -> TimeSeries:
+        """Generate stationary noise time series if noise is enabled."""
+        if not hasattr(self, "__noise_timeseries"):
+            self.__noise_timeseries = (
+                self.noise_frequencyseries.to_timeseries()
+                if self.noise
                 else TimeSeries._EMPTY(self.ND, self.dt)
             )
         return self.__noise_timeseries
+
+    @property
+    def noise_wavelet(self) -> Wavelet:
+        """Generate wavelet-transformed noise time series."""
+        if not hasattr(self, "__noise_wavelet"):
+            if self.noise:
+                self.__noise_wavelet = self.noise_timeseries.to_wavelet(Nf=self.Nf)
+            else:
+                self.__noise_wavelet = Wavelet.zeros_from_grid(self.t_grid, self.f_grid)
+        return self.__noise_wavelet
 
     @property
     def data_timeseries(self) -> TimeSeries:
@@ -215,18 +239,11 @@ class AnalysisData:
     def data_wavelet(self) -> Wavelet:
         """Apply gap windowing and high-pass filtering to data time series and compute wavelet."""
         if not hasattr(self, "__data_wavelet"):
-            data_timeseries = self.data_timeseries
-            if self.highpass_fmin:
-                data_timeseries = data_timeseries.highpass_filter(
-                    fmin=self.highpass_fmin, tukey_window_alpha=self.alpha
+            self.__data_wavelet = self.noise_wavelet + self.hwavelet
+            if self.gaps:
+                self.__data_wavelet = self.gaps.apply_nan_gap_to_wavelet(
+                    self.__data_wavelet
                 )
-            self.__data_wavelet = (
-                data_timeseries.to_wavelet(Nf=self.Nf)
-                if not self.gaps
-                else self.gaps.gap_n_transform_timeseries(
-                    data_timeseries, self.Nf, self.alpha, self.highpass_fmin
-                )
-            )
         return self.__data_wavelet
 
     @property
@@ -347,8 +364,8 @@ class AnalysisData:
                 ht, self.Nf, self.alpha, self.highpass_fmin
             )
         else:
-            if self.highpass_fmin:
-                ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
+            # if self.highpass_fmin:
+            #     ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
             hwavelet = ht.to_wavelet(Nf=self.Nf)
         return hwavelet
 
