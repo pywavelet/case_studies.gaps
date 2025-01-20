@@ -6,9 +6,10 @@ from typing import List
 
 import arviz as az
 import emcee
-import eryn 
+from eryn.ensemble import EnsembleSampler
+from eryn.prior import ProbDistContainer, uniform_dist
 import numpy as np
-from bilby.core.prior import Gaussian, PriorDict, Uniform
+# from bilby.core.prior import Gaussian, PriorDict, Uniform
 
 from .analysis_data import AnalysisData
 from .constants import *
@@ -19,37 +20,30 @@ from .signal_utils import waveform
 
 from .utils import _fmt_rutime
 
-PRIOR = PriorDict(
-    dict(
-        ln_a=Uniform(*LN_A_RANGE),
-        ln_f=Uniform(*LN_F_RANGE),
-        ln_fdot=Uniform(*LN_FDOT_RANGE),
-    )
-)
+priors_in = {
+    0: uniform_dist(*LN_A_RANGE),
+    1: uniform_dist(*LN_F_RANGE),
+    2: uniform_dist(*LN_FDOT_RANGE)
+}  
 
-
-
-def generate_centered_prior(ln_a, ln_f, ln_fdot):
-    return PriorDict(dict(
-        ln_a=Gaussian(mu=ln_a, sigma=LN_A_SCALE * 0.1),
-        ln_f=Gaussian(mu=ln_f, sigma=LN_F_SCALE * 0.1),
-        ln_fdot=Gaussian(mu=ln_fdot, sigma=LN_FDOT_SCALE * 0.1),
-    ))
-
+PRIOR = ProbDistContainer(priors_in)   # Set up priors so they can be used with the sampler.
 
 def log_prior(theta):
     ln_a, ln_f, ln_fdot = theta
-    _lnp = PRIOR.ln_prob(dict(ln_a=ln_a, ln_f=ln_f, ln_fdot=ln_fdot))
+    _lnp = PRIOR.logpdf(np.array([ln_a, ln_f, ln_fdot]))
     if not np.isfinite(_lnp):
         return -np.inf
     else:
         return 0.0
 
 
-def sample_prior(prior: PriorDict, n_samples=1) -> np.ndarray:
+def sample_prior(prior_container, n_samples=1) -> np.ndarray:
     """Return (nsamp, ndim) array of samples"""
-    return np.array(list(prior.sample(n_samples).values())).T
+    return np.array(list(prior_container.rvs(size=n_samples),1)).T
 
+
+def log_like(theta: List[float], analysis_data: AnalysisData) -> float:
+    return analysis_data.lnl(*theta)
 
 def log_posterior(theta: List[float], analysis_data: AnalysisData) -> float:
     _lp = log_prior(theta)
@@ -58,7 +52,6 @@ def log_posterior(theta: List[float], analysis_data: AnalysisData) -> float:
     else:
         _lnl = analysis_data.lnl(*theta)
         return _lp + _lnl
-
 
 def run_mcmc(
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
@@ -70,6 +63,7 @@ def run_mcmc(
     highpass_fmin=None,
     frange=None,
     noise_realisation=False,
+    burnin=200,
     n_iter=2500,
     nwalkers=32,
     random_seed=None,
@@ -111,20 +105,18 @@ def run_mcmc(
         waveform_parameters=true_params,
         plotfn=f"{outdir}/data.png",
     )
-
     if true_params:
         # check that the true parameters are within the prior
-        for key, val in zip(PRIOR.keys(), true_params):
-            if PRIOR.ln_prob({key: val}) == -np.inf:
-                raise ValueError(f"True parameter {key}={val} is not within the prior")
+        if PRIOR.logpdf(np.array(true_params)) == -np.inf:
+            raise ValueError(f"True parameter is not within the prior")
 
-    centered_prior = generate_centered_prior(*true_params)
-    x0 = sample_prior(centered_prior, nwalkers)  # Starting coordinates
-    print(f"Starting coordinates: {np.median(x0, axis=0)}, true values: {true_params}")
+    x0 = PRIOR.rvs(size = nwalkers) 
+    print(f"Starting coordinates: , {np.median(x0, axis=0)}")
+    print(f"true values: {true_params}")
     nwalkers, ndim = x0.shape
 
     # Check likelihood
-    llike_val = log_posterior(true_params, analysis_data)
+    llike_val = log_like(true_params, analysis_data)
     print("Value of likelihood at true values is", llike_val)
     if noise_realisation is False and not np.isclose(llike_val, 0.0):
         warnings.warn(
@@ -133,30 +125,26 @@ def run_mcmc(
 
     N_cpus = cpu_count()
     pool = get_context("fork").Pool(N_cpus)
+    
+
     sampler = emcee.EnsembleSampler(
         nwalkers, ndim, log_posterior, pool=pool, args=(analysis_data,)
     )
-    sampler.run_mcmc(x0, n_iter, progress=True)
+    
+    print("Running burnin phase")
+    x0_after_burnin = sampler.run_mcmc(x0, burnin, progress=True)
+    sampler.reset()
+
+    sampler.run_mcmc(x0_after_burnin, n_iter, progress=True)
     pool.close()
 
 
 
     runtime = time.time() - _start_time
 
-
-    # print("Ollie's simple plotting")
-    # import matplotlib.pyplot as plt
-    # plt.clf()
-    # chain_a_flattened = sampler.get_chain()[:,:,1].flatten()
-    # log_like = sampler.get_log_prob()
-    # plt.plot(chain_a_flattened);plt.show()
-    # plt.clf()
-    # plt.plot(log_like);plt.show()
-
-
     # Save the chain
     idata_fname = os.path.join(outdir, "emcee_chain.nc")
-    idata = az.from_emcee(sampler, var_names=["a", "ln_f", "ln_fdot"])
+    idata = az.from_emcee(sampler, var_names=["ln_a", "ln_f", "ln_fdot"])
     idata.sample_stats["runtime"] = runtime
     idata = az.InferenceData(
         posterior=idata.posterior,
