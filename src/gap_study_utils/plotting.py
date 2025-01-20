@@ -104,14 +104,3 @@ def plot_corner(idata_fname, trues=None, fname="corner.png"):
     )
     plt.savefig(fname)
 
-
-def plot_prior(prior: "bilby.core.prior.PriorDict", fname="prior.png"):
-    fig, axes = plt.subplots(1, 3, figsize=(10, 4))
-    for ax, (key, dist) in zip(axes, prior.items()):
-        x = np.sort(dist.sample(1000))
-        ax.plot(x, dist.prob(x), label="prior")
-        ax.set_title(key)
-    for i, t in enumerate(TRUES):
-        axes[i].axvline(t, c="red", linestyle="--", label="truth")
-    plt.tight_layout()
-    plt.savefig(fname)
