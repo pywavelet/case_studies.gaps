@@ -1,13 +1,30 @@
 # CHANGELOG
 
 
+## v0.1.2 (2025-01-20)
+
+### Unknown
+
+* Merge remote-tracking branch 'origin/main' ([`0ae04f4`](https://github.com/pywavelet/case_studies.gaps/commit/0ae04f48ac48112f2baecc2c8beb6d24e3899d8b))
+
+
 ## v0.1.1 (2025-01-20)
 
 ### Bug Fixes
 
+* fix: add lnl tests ([`7a4b703`](https://github.com/pywavelet/case_studies.gaps/commit/7a4b703166a976291c2108b333a1acf4c50627aa))
+
 * fix: remove harcoded highpass filter, change hdatawavelet construction (signal(t,f) + noise(t,f)) rather than converting data(t) = noise(t) + signal(t)) ([`e4f1a8c`](https://github.com/pywavelet/case_studies.gaps/commit/e4f1a8c560a6bc66d58eca0e793cb25a7f855c2a))
 
+### Chores
+
+* chore(release): 0.1.1 ([`14225b4`](https://github.com/pywavelet/case_studies.gaps/commit/14225b4bdf6cea95bffb9dd4cabaf1a599014efc))
+
 ### Unknown
+
+* change __ to _ for private vars ([`9da28fe`](https://github.com/pywavelet/case_studies.gaps/commit/9da28fed2419b9a20be30026bcd67ffffeaf235b))
+
+* add log when noise being generated ([`a89c215`](https://github.com/pywavelet/case_studies.gaps/commit/a89c21556b04d30efe909b16aafa7916ba387ae6))
 
 * add LnL amplitude check ([`a166fe3`](https://github.com/pywavelet/case_studies.gaps/commit/a166fe3db3fa2adf7cbd99655f1901c9e4bc57ee))
 
