@@ -12,15 +12,19 @@ os.makedirs(OUTDIR, exist_ok=True)
 NITER = 250
 DT = 20
 TMAX = 327_680
+# GAPS = [
+#     [TMAX * 0.22, TMAX * 0.3],
+#     [TMAX * 0.52, TMAX * 0.63],
+# ]
 GAPS = [
-    [TMAX * 0.22, TMAX * 0.3],
-    [TMAX * 0.52, TMAX * 0.63],
+    # [TMAX * 0.22, TMAX * 0.3],
+    [TMAX * 0.499999, TMAX * 0.50001],
 ]
 
 common_kwgs = dict(
     n_iter=NITER,
-    alpha=0.0,
-    highpass_fmin=None,# * F_TRUE / 4,
+    alpha=0.2,
+    highpass_fmin=1e-4,# * F_TRUE / 4,
     dt=DT,
     tmax=TMAX,
     frange=[0.002, 0.007],
@@ -49,9 +53,9 @@ if __name__ == "__main__":
     #     **common_kwgs,
     # )
     #
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=False,
-        outdir=f"{OUTDIR}/gap",
-        **common_kwgs
-    )
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=False,
+    #     outdir=f"{OUTDIR}/gap",
+    #     **common_kwgs
+    # )

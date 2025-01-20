@@ -27,7 +27,7 @@ dependencies = [
     "scipy>=1.10.0", #
     "numpy",
     "arviz>=0.18.0",
-#    "eryn",
+    "eryn",
     "bilby",
     "gif",
     "numba",
