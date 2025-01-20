@@ -6,10 +6,8 @@ from typing import List
 
 import arviz as az
 import emcee
-from eryn.ensemble import EnsembleSampler
 from eryn.prior import ProbDistContainer, uniform_dist
 import numpy as np
-# from bilby.core.prior import Gaussian, PriorDict, Uniform
 
 from .analysis_data import AnalysisData
 from .constants import *
@@ -89,7 +87,6 @@ def run_mcmc(
     os.makedirs(outdir, exist_ok=True)
     if random_seed is not None:
         seed(random_seed)
-
     analysis_data = AnalysisData(
         data_kwargs=dict(
             dt=dt,
