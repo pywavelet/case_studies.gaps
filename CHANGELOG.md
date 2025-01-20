@@ -1,7 +1,22 @@
 # CHANGELOG
 
 
+## v0.1.1 (2025-01-20)
+
+### Bug Fixes
+
+* fix: remove harcoded highpass filter, change hdatawavelet construction (signal(t,f) + noise(t,f)) rather than converting data(t) = noise(t) + signal(t)) ([`e4f1a8c`](https://github.com/pywavelet/case_studies.gaps/commit/e4f1a8c560a6bc66d58eca0e793cb25a7f855c2a))
+
+### Unknown
+
+* add LnL amplitude check ([`a166fe3`](https://github.com/pywavelet/case_studies.gaps/commit/a166fe3db3fa2adf7cbd99655f1901c9e4bc57ee))
+
+
 ## v0.1.0 (2025-01-16)
+
+### Chores
+
+* chore(release): 0.1.0 ([`32e4e3c`](https://github.com/pywavelet/case_studies.gaps/commit/32e4e3c435093f6ce908bec3cab901a994d7f531))
 
 ### Unknown
 
