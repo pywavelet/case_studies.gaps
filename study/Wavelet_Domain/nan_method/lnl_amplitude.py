@@ -12,6 +12,7 @@ outdir = "1d_plots"
 os.makedirs(outdir, exist_ok=True)
 
 
+FISHER_FACTOR = 5
 true_params = [LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE]
 kwargs = dict(
     data_kwargs=dict(
@@ -28,11 +29,13 @@ kwargs = dict(
     plotfn=f"{outdir}/data.png",
 )
 
+TITLE = "$A \pm " + str(FISHER_FACTOR) + "\\times A / \sqrt{ d(f)^2 / P(f)}$"
+
 
 def get_ln_a_gridpoints(N_points, noiseless_data_freq, psd_freq):
     precision = A_TRUE / np.sqrt(np.nansum(noiseless_data_freq ** 2 / psd_freq))
     a_range = np.linspace(
-        A_TRUE - 5 * precision, A_TRUE + 5 * precision, N_points
+        A_TRUE - FISHER_FACTOR * precision, A_TRUE + FISHER_FACTOR * precision, N_points
     )
     ln_a_range = np.log(a_range)
     return ln_a_range
@@ -43,10 +46,12 @@ def plot_lnL_vs_lnA(lnls, lnls_noisy, ln_a_grid):
     ax_twin = ax.twinx()
     clean_col = 'tab:blue'
     noisy_col = 'tab:orange'
-    ax.plot(ln_a_grid, lnls, label="clean", color=clean_col)
-    ax_twin.plot(ln_a_grid, lnls_noisy, label="noisy", color=noisy_col)
-    ax.axvline(LN_A_TRUE, color="k", linestyle="--")
-    ax.set_xlabel("ln(A)")
+    a_grid = np.exp(ln_a_grid)
+    fig.suptitle(TITLE)
+    ax.plot(a_grid, lnls, label="clean", color=clean_col)
+    ax_twin.plot(a_grid, lnls_noisy, label="noisy", color=noisy_col)
+    ax.axvline(np.exp(LN_A_TRUE), color="k", linestyle="--")
+    ax.set_xlabel("A")
     ax.axhline(0, color="k")
     ax.set_ylabel("lnL(clean)", color=clean_col)
     ax_twin.set_ylabel("lnL(noisy)", color=noisy_col)
@@ -61,7 +66,7 @@ def _set_spine_color(ax, spine_label, color):
     ax.tick_params(axis='y', colors=color)
 
 
-def main(N_points=15):
+def main(N_points=50):
     clean_data = AnalysisData(**kwargs)
     kwargs["data_kwargs"]["noise"] = True
     kwargs['plotfn'] = f"{outdir}/noisy_data.png"
