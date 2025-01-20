@@ -29,12 +29,12 @@ common_kwgs = dict(
 
 
 if __name__ == "__main__":
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=True,
-        outdir=f"{OUTDIR}/gap+noise",
-        **common_kwgs
-    )
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=True,
+    #     outdir=f"{OUTDIR}/gap+noise",
+    #     **common_kwgs
+    # )
 
     # run_mcmc(
     #     gap_ranges=None,
@@ -42,16 +42,16 @@ if __name__ == "__main__":
     #     outdir=f"{OUTDIR}/noise",
     #     **common_kwgs
     # )
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/basic",
-    #     **common_kwgs,
-    # )
-    #
     run_mcmc(
-        gap_ranges=GAPS,
+        gap_ranges=None,
         noise_realisation=False,
-        outdir=f"{OUTDIR}/gap",
-        **common_kwgs
+        outdir=f"{OUTDIR}/basic",
+        **common_kwgs,
     )
+    #
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=False,
+    #     outdir=f"{OUTDIR}/gap",
+    #     **common_kwgs
+    # )
