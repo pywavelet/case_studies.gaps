@@ -44,10 +44,10 @@ class GapWindow:
             type (GapType):
                 Type of gap window to apply. It can be either GapType.STITCH or GapType.RECTANGULAR_WINDOW.
         """
-        self.__overlap_check(gap_ranges)
+        self._overlap_check(gap_ranges)
         self.gap_ranges = gap_ranges
         self.n_gaps = len(gap_ranges)
-        self.nan_mask = self.__generate_nan_mask(time, gap_ranges)
+        self.nan_mask = self._generate_nan_mask(time, gap_ranges)
         self.gap_bools = np.isnan(
             self.nan_mask
         )  # True for valid data, False for gaps
@@ -102,7 +102,7 @@ class GapWindow:
         return f"GapWindow({self.type}, {self.num_nans:,}/{len(self.nan_mask):,} NaNs)"
 
     @staticmethod
-    def __generate_nan_mask(
+    def _generate_nan_mask(
         t: np.ndarray, gap_ranges: List[Tuple[float, float]]
     ) -> np.ndarray:
         """Returns [1,1,1,0,0,0,1,1,1] , where nan is in the gap"""
@@ -153,7 +153,7 @@ class GapWindow:
         return ax
 
     @staticmethod
-    def __overlap_check(gap_ranges: List[Tuple[float, float]]):
+    def _overlap_check(gap_ranges: List[Tuple[float, float]]):
         for i in range(len(gap_ranges) - 1):
             if gap_ranges[i][1] > gap_ranges[i + 1][0]:
                 raise ValueError(
@@ -180,7 +180,7 @@ class GapWindow:
             chunks.append(ts)
         return chunks
 
-    def __gap_timeseries_chunk_transform_wdm_n_stitch(
+    def _gap_timeseries_chunk_transform_wdm_n_stitch(
         self,
         ht: TimeSeries,
         Nf: int,
@@ -221,7 +221,7 @@ class GapWindow:
         tmask = time_bins <= self.tmax
         return Wavelet(stitched_data[:, tmask], time_bins[tmask], freq_bins)
 
-    def __gap_timeseries_with_0s_n_transform(
+    def _gap_timeseries_with_0s_n_transform(
         self, ht: TimeSeries, Nf: int, alpha: float = 0.0, fmin: float = 0
     ) -> Wavelet:
         if fmin:
@@ -238,11 +238,11 @@ class GapWindow:
         self, ht: TimeSeries, Nf: int, alpha: float = 0.0, fmin: float = 0
     ) -> Wavelet:
         if self.type == GapType.STITCH:
-            return self.__gap_timeseries_chunk_transform_wdm_n_stitch(
+            return self._gap_timeseries_chunk_transform_wdm_n_stitch(
                 ht, Nf, alpha, fmin
             )
         elif self.type == GapType.RECTANGULAR_WINDOW:
-            return self.__gap_timeseries_with_0s_n_transform(
+            return self._gap_timeseries_with_0s_n_transform(
                 ht, Nf, alpha, fmin
             )
         else:
