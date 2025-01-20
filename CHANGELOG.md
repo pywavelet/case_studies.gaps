@@ -1,7 +1,41 @@
 # CHANGELOG
 
 
+## v0.1.4 (2025-01-20)
+
+### Bug Fixes
+
+* fix: adding highpass filtering + windowing, adding Eryn
+
+Merge pull request #1 from pywavelet/ollie_dev ([`08ad07e`](https://github.com/pywavelet/case_studies.gaps/commit/08ad07eec587f19fffa93bbfc2f37711505e181b))
+
+### Unknown
+
+* considering small gap, rather than two ([`cfcd853`](https://github.com/pywavelet/case_studies.gaps/commit/cfcd8536f1783bb00c938a02ce78b48071b88a3d))
+
+* adding in burnin feature ([`cebc1c4`](https://github.com/pywavelet/case_studies.gaps/commit/cebc1c46c1a0cfb4248fe3021b2287dfcd9bdbe4))
+
+* allowing for filtering + window ([`35dc907`](https://github.com/pywavelet/case_studies.gaps/commit/35dc907d716d9fc462f6bc59f0bf8cfa16ccf4e2))
+
+* eryn priors with extra burnin phase
+
+Added in eryn priors and included an extra step to allow for burnin.
+
+The format for eryn (final .hdf5) is a little different from the .hdf5 file
+that is produced using emcee. This makes it incompatible with the package _arviz_.
+
+Need to resolve this, or change plotting utilities if we wish to change to eryn. ([`52e5625`](https://github.com/pywavelet/case_studies.gaps/commit/52e56253033c4bd72bcf3f3e3649e79ee4f1a578))
+
+* testing no gaps no noise ([`4528af2`](https://github.com/pywavelet/case_studies.gaps/commit/4528af2eff9fa1d79229bfa454f53c0a81312077))
+
+* pip install uses eryn ([`b37f991`](https://github.com/pywavelet/case_studies.gaps/commit/b37f9911759a18634bc86b38fe0701a42c9d4f5e))
+
+
 ## v0.1.3 (2025-01-20)
+
+### Chores
+
+* chore(release): 0.1.3 ([`910e6cf`](https://github.com/pywavelet/case_studies.gaps/commit/910e6cf0cf8732d5db8abf8fa6fcd37eeeb7bfe0))
 
 ### Unknown
 
