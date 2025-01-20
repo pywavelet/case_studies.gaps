@@ -6,8 +6,9 @@ from typing import List
 
 import arviz as az
 import emcee
+import eryn 
 import numpy as np
-from bilby.core.prior import Gaussian, PriorDict, TruncatedGaussian, Uniform
+from bilby.core.prior import Gaussian, PriorDict, Uniform
 
 from .analysis_data import AnalysisData
 from .constants import *
@@ -125,7 +126,6 @@ def run_mcmc(
     # Check likelihood
     llike_val = log_posterior(true_params, analysis_data)
     print("Value of likelihood at true values is", llike_val)
-    print(f"matched_filter_snr: {analysis_data.snr_dict['matched_filter_snr']:.2f}")
     if noise_realisation is False and not np.isclose(llike_val, 0.0):
         warnings.warn(
             f"LnL(True values) = {llike_val:.3e} != 0.0... SUSPICIOUS!"
@@ -156,7 +156,7 @@ def run_mcmc(
 
     # Save the chain
     idata_fname = os.path.join(outdir, "emcee_chain.nc")
-    idata = az.from_emcee(sampler, var_names=["ln_a", "ln_f", "ln_fdot"])
+    idata = az.from_emcee(sampler, var_names=["a", "ln_f", "ln_fdot"])
     idata.sample_stats["runtime"] = runtime
     idata = az.InferenceData(
         posterior=idata.posterior,
