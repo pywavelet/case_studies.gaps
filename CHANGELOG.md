@@ -1,7 +1,22 @@
 # CHANGELOG
 
 
+## v0.1.3 (2025-01-20)
+
+### Unknown
+
+* Merge branch 'main' of github.com:pywavelet/case_studies.gaps ([`42706a4`](https://github.com/pywavelet/case_studies.gaps/commit/42706a4fef1505995c14ee697d7947be72722a7a))
+
+
 ## v0.1.2 (2025-01-20)
+
+### Bug Fixes
+
+* fix: add gap corners ([`68a540f`](https://github.com/pywavelet/case_studies.gaps/commit/68a540fa76336d1180430ddfa3347fc837961738))
+
+### Chores
+
+* chore(release): 0.1.2 ([`3cf1849`](https://github.com/pywavelet/case_studies.gaps/commit/3cf18491c7a6a7449a7496f9e03b1d8d1187195d))
 
 ### Unknown
 
