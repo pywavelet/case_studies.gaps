@@ -74,7 +74,7 @@ class AnalysisData:
         self.dt = self.data_kwargs.get("dt", DT)
         self.tmax = self.data_kwargs.get("tmax", TMAX)
         self.alpha = self.data_kwargs.get("alpha", 0.0)
-        self.highpass_fmin = None # self.data_kwargs.get("highpass_fmin", None) HARD CODED
+        self.highpass_fmin = self.data_kwargs.get("highpass_fmin", None) #HARD CODED
         self.frange = self.data_kwargs.get("frange", None)
         self.noise = self.data_kwargs.get("noise", False)
         self.ND = int(self.tmax / self.dt)
@@ -372,8 +372,8 @@ class AnalysisData:
                 ht, self.Nf, self.alpha, self.highpass_fmin
             )
         else:
-            # if self.highpass_fmin:
-            #     ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
+            if self.highpass_fmin:
+                ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
             hwavelet = ht.to_wavelet(Nf=self.Nf)
         return hwavelet
 
