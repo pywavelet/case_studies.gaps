@@ -224,7 +224,7 @@ class GapWindow:
     def __gap_timeseries_with_0s_n_transform(
         self, ht: TimeSeries, Nf: int, alpha: float = 0.0, fmin: float = 0
     ) -> Wavelet:
-        if fmin != 0:
+        if fmin:
             ht.highpass_filter(fmin, alpha)
         # convert gapped timepoints to 0s
         ht.data[self.gap_bools] = 0

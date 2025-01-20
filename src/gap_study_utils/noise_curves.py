@@ -61,6 +61,8 @@ def noise_PSD_AE(f: np.ndarray, TDI="TDI1"):
         S = 32 * np.sin(x) ** 2 * np.sin(2 * x) ** 2 * S_val
     else:
         raise ValueError("TDI must be either TDI1 or TDI2")
+
+    S[0] = S[1] # avoid nan error
     return FrequencySeries(data=S, freq=f)
 
 

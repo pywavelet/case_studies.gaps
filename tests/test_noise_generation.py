@@ -4,6 +4,7 @@ from pywavelet.utils import evolutionary_psd_from_stationary_psd
 
 from gap_study_utils.noise_curves import (
     CornishPowerSpectralDensity,
+    noise_PSD_AE,
     generate_stationary_noise,
 )
 
@@ -69,3 +70,45 @@ def test_generate_stationary_noise(plot_dir):
         # assert non-zero, non-nan values for entire time series
         assert np.all(~np.isnan(noise.data)), f"Noise {noise} has NaNs"
         assert np.all(noise.data != 0), f"Noise {noise} is all zeros"
+
+
+def test_noise_fluctuates_aroud_true(plot_dir):
+    rough_duration = 0.25 * S_IN_DAY
+    fs = 10
+    dt = 1 / fs
+
+    # N = closest power of 2 to duration * fs
+    N = 2 ** int(np.ceil(np.log2(rough_duration * fs)))
+    duration = N * dt
+    label = f"N = {N:,}, T = {duration / S_IN_DAY:.2f} days"
+    print(f"Noise {label}")
+
+    freq = np.fft.rfftfreq(N, dt)
+
+
+
+
+    cornish_psd = CornishPowerSpectralDensity(freq)
+    tdi1_psd = noise_PSD_AE(freq, TDI="TDI1")
+    cornish_noise = generate_stationary_noise(
+        ND=N, dt=dt, psd=cornish_psd, time_domain=False
+    )
+    tdi1_noise = generate_stationary_noise(
+        ND=N, dt=dt, psd=tdi1_psd, time_domain=False
+    )
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+    axes[0].loglog(cornish_psd.freq, cornish_psd.data, label="Cornish PSD")
+    cornish_noise.plot_periodogram(ax=axes[0], label="Noise")
+
+    axes[0].legend()
+    axes[1].loglog(tdi1_psd.freq, tdi1_psd.data, label="TDI1 PSD")
+    tdi1_noise.plot_periodogram(ax=axes[1], label="Noise")
+
+    # assert no nans in td1 noise
+    assert np.all(~np.isnan(tdi1_noise.data)), f"Noise has NaNs N nans = {np.sum(np.isnan(tdi1_noise.data))}"
+
+    axes[1].legend()
+    axes[1].set_xlabel("Frequency [Hz]")
+    plt.tight_layout()
+    plt.savefig(f"{plot_dir}/noise_fluctuates_around_true.png")

@@ -28,9 +28,6 @@ def plot_trace(idata: az.InferenceData, axes, i=None, max_iter=None, trues=None)
         if i is not None:
             axes[row, 1].axvline(i, c="green", linestyle="--")
             axes[row, 1].set_xlim(0, max_iter)
-    axes[0, 0].set_xscale("log")
-    axes[0, 1].set_yscale("log")
-
 
 @gif.frame
 def _trace_mcmc_frame(idata, analysis_data: AnalysisData, i, max_iter=None):
@@ -95,10 +92,11 @@ def plot_corner(idata_fname, trues=None, fname="corner.png"):
     burnin = 0.5
     burnin_idx = int(burnin * len(idata.sample_stats.draw))
     idata = idata.sel(draw=slice(burnin_idx, None))
+    idata.posterior["ln_a"] = np.exp(idata.posterior.ln_a)
     idata.posterior["ln_f"] = np.exp(idata.posterior.ln_f)
     idata.posterior["ln_fdot"] = np.exp(idata.posterior.ln_fdot)
     trues = trues.copy()
-    for i in range(1, 3):
+    for i in range(3):
         trues[i] = np.exp(trues[i])
 
     corner.corner(

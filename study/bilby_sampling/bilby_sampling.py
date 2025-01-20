@@ -48,7 +48,7 @@ class WaveletLikelihood(Likelihood):
 EMCEE_ARGS = dict(  # type: ignore
     sampler='emcee',
     nwalkers=20,
-    iterations=4000
+    iterations=500
 )
 
 
@@ -125,11 +125,11 @@ def run_analysis(
 
     likelihood = WaveletLikelihood(true_dict.copy(), analysis_data)
 
-    prior = generate_centered_prior(**true_dict)
+    # prior = generate_centered_prior(**true_dict)
 
     result = run_sampler(
         likelihood,
-        priors=prior,
+        priors=PRIOR,
         label=label,
         outdir=outdir,
         injection_parameters=true_dict,
@@ -212,6 +212,7 @@ common_kwgs = dict(
     tmax=TMAX,
     frange=[0.002, 0.007],
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
+    sampler_kwgs=EMCEE_ARGS,
 )
 
 if __name__ == "__main__":
@@ -220,29 +221,12 @@ if __name__ == "__main__":
         gap_ranges=None,
         noise_realisation=False,
         outdir=f"{OUTDIR}/basic_mcmc",
-        sampler_kwgs=EMCEE_ARGS,
         **common_kwgs,
     )
     run_analysis(
         gap_ranges=None,
         noise_realisation=True,
         outdir=f"{OUTDIR}/noise_mcmc",
-        sampler_kwgs=EMCEE_ARGS,
         **common_kwgs
     )
-    # run_analysis(
-    #     gap_ranges=None,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/basic_ns",
-    #     sampler_kwgs=DYENSTY_ARGS,
-    #     **common_kwgs,
-    # )
-    # run_analysis(
-    #     gap_ranges=None,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/noise_ns",
-    #     sampler_kwgs=DYENSTY_ARGS,
-    #     **common_kwgs
-    # )
-
 

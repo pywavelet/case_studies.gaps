@@ -16,6 +16,7 @@ from .constants import DT, GAP_RANGES, NF, TMAX, TRUES
 from .gap_window import GapType, GapWindow
 from .noise_curves import (
     CornishPowerSpectralDensity,
+    noise_PSD_AE,
     generate_stationary_noise,
 )
 from .signal_utils import waveform

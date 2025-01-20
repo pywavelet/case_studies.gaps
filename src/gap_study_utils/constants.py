@@ -2,7 +2,7 @@ import numpy as np
 
 ONE_HOUR = 60 * 60
 ONE_DAY = 24 * ONE_HOUR
-A_TRUE = 2e-20
+A_TRUE = 2e-21
 F_TRUE = 3e-3
 FDOT_TRUE = 1e-8
 DT = 20
