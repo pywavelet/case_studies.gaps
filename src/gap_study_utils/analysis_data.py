@@ -106,7 +106,7 @@ class AnalysisData:
 
     @property
     def ND(self) -> int:
-        return self.__ND
+        return self._ND
 
     @ND.setter
     def ND(self, n: int):
@@ -120,146 +120,153 @@ class AnalysisData:
                 f"Current settings:\n\t {current}\n"
                 f"Suggested settings:\n\t {suggestion}"
             )
-        self.__ND = n
+        self._ND = n
 
     @property
     def psd_freqseries(self) -> FrequencySeries:
         """Generate the frequency series PSD if it hasn't been computed."""
-        if not hasattr(self, "__psd_freqseries"):
-            self.__psd_freqseries = CornishPowerSpectralDensity(self.freq)
-        return self.__psd_freqseries
+        if not hasattr(self, "_psd_freqseries"):
+            self._psd_freqseries = CornishPowerSpectralDensity(self.freq)
+        return self._psd_freqseries
 
     @property
     def psd_wavelet(self) -> Wavelet:
         """Compute the wavelet form of the evolutionary PSD."""
-        if not hasattr(self, "__psd_wavelet"):
+        if not hasattr(self, "_psd_wavelet"):
             psd = self.psd_freqseries
-            self.__psd_wavelet = evolutionary_psd_from_stationary_psd(
+            self._psd_wavelet = evolutionary_psd_from_stationary_psd(
                 psd.data, psd.freq, self.f_grid, self.t_grid, self.dt
             )
-        return self.__psd_wavelet
+        return self._psd_wavelet
 
     @property
     def psd(self) -> Wavelet:
         """Return the PSD for the analysis."""
-        if not hasattr(self, "__psd"):
+        if not hasattr(self, "_psd"):
             p = self.psd_wavelet.copy()
             if self.gaps:
                 p = self.gaps.apply_nan_gap_to_wavelet(p)
-            self.__psd = p
-        return self.__psd
+            self._psd = p
+        return self._psd
 
     @property
     def ht(self) -> TimeSeries:
         """Generate the time series from the waveform generator if provided."""
-        if not hasattr(self, "__ht"):
-            self.__ht = (
+        if not hasattr(self, "_ht"):
+            self._ht = (
                 self.waveform_generator(*self.waveform_parameters, self.time)
                 if self.waveform_generator
                 else TimeSeries._EMPTY(self.ND, self.dt)
             )
 
-        return self.__ht
+        return self._ht
 
     @property
     def noise_frequencyseries(self) -> FrequencySeries:
         """Generate stationary noise frequency series if noise is enabled."""
-        if not hasattr(self, "__noise_frequencyseries"):
-            self.__noise_frequencyseries = (
+        if not hasattr(self, "_noise_frequencyseries"):
+            self._noise_frequencyseries = (
                 generate_stationary_noise(
                     ND=self.ND, dt=self.dt, psd=self.psd_freqseries
                 )
                 if self.noise
                 else FrequencySeries._EMPTY(self.Nf, self.Nt)
             )
-        return self.__noise_frequencyseries
+        return self._noise_frequencyseries
 
 
     @property
     def noise_timeseries(self) -> TimeSeries:
         """Generate stationary noise time series if noise is enabled."""
-        if not hasattr(self, "__noise_timeseries"):
-            self.__noise_timeseries = (
+        if not hasattr(self, "_noise_timeseries"):
+            self._noise_timeseries = (
                 self.noise_frequencyseries.to_timeseries()
                 if self.noise
                 else TimeSeries._EMPTY(self.ND, self.dt)
             )
-        return self.__noise_timeseries
+        return self._noise_timeseries
 
     @property
     def noise_wavelet(self) -> Wavelet:
         """Generate wavelet-transformed noise time series."""
-        if not hasattr(self, "__noise_wavelet"):
+        if not hasattr(self, "_noise_wavelet"):
             if self.noise:
-                self.__noise_wavelet = self.noise_timeseries.to_wavelet(Nf=self.Nf)
+                self._noise_wavelet = self.noise_timeseries.to_wavelet(Nf=self.Nf)
             else:
-                self.__noise_wavelet = Wavelet.zeros_from_grid(self.t_grid, self.f_grid)
-        return self.__noise_wavelet
+                self._noise_wavelet = Wavelet.zeros_from_grid(self.t_grid, self.f_grid)
+        return self._noise_wavelet
 
     @property
     def data_timeseries(self) -> TimeSeries:
         """Combine the signal and noise time series."""
-        if not hasattr(self, "__data_timeseries"):
-            self.__data_timeseries = self.ht + self.noise_timeseries
-        return self.__data_timeseries
+        if not hasattr(self, "_data_timeseries"):
+            self._data_timeseries = self.ht + self.noise_timeseries
+        return self._data_timeseries
 
     @property
     def hf(self) -> FrequencySeries:
         """Convert time series to frequency series."""
-        if not hasattr(self, "__hf"):
-            self.__hf = self.ht.to_frequencyseries()
-        return self.__hf
+        if not hasattr(self, "_hf"):
+            self._hf = self.ht.to_frequencyseries()
+        return self._hf
 
     @property
     def data_frequencyseries(self) -> FrequencySeries:
         """Convert data time series to frequency series."""
-        if not hasattr(self, "__data_frequencyseries"):
-            self.__data_frequencyseries = (
+        if not hasattr(self, "_data_frequencyseries"):
+            self._data_frequencyseries = (
                 self.data_timeseries.to_frequencyseries()
             )
-        return self.__data_frequencyseries
+        return self._data_frequencyseries
 
     @property
     def hwavelet(self) -> Wavelet:
         """Compute wavelet transform of the time series."""
-        if not hasattr(self, "__hwavelet"):
-            self.__hwavelet = self.ht.to_wavelet(Nf=self.Nf)
-        return self.__hwavelet
+        if not hasattr(self, "_hwavelet"):
+            self._hwavelet = self.ht.to_wavelet(Nf=self.Nf)
+        return self._hwavelet
 
     @property
     def hwavelet_gapped(self) -> Wavelet:
         """Apply gap windowing to the wavelet-transformed time series."""
-        if not hasattr(self, "__hwavelet_gapped"):
-            self.__hwavelet_gapped = self.gaps.gap_n_transform_timeseries(
+        if not hasattr(self, "_hwavelet_gapped"):
+            self._hwavelet_gapped = self.gaps.gap_n_transform_timeseries(
                 self.ht, self.Nf, self.alpha, self.highpass_fmin
             )
-        return self.__hwavelet_gapped
+        return self._hwavelet_gapped
 
     @property
     def data_wavelet(self) -> Wavelet:
         """Apply gap windowing and high-pass filtering to data time series and compute wavelet."""
-        if not hasattr(self, "__data_wavelet"):
-            self.__data_wavelet = self.noise_wavelet + self.hwavelet
-            if self.gaps:
-                self.__data_wavelet = self.gaps.apply_nan_gap_to_wavelet(
-                    self.__data_wavelet
+        if not hasattr(self, "_data_wavelet"):
+            data_timeseries = self.data_timeseries
+            if self.highpass_fmin:
+                data_timeseries = data_timeseries.highpass_filter(
+                    fmin=self.highpass_fmin, tukey_window_alpha=self.alpha
                 )
-        return self.__data_wavelet
+            self._data_wavelet = (
+                data_timeseries.to_wavelet(Nf=self.Nf)
+                if not self.gaps
+                else self.gaps.gap_n_transform_timeseries(
+                    data_timeseries, self.Nf, self.alpha, self.highpass_fmin
+                )
+            )
+        return self._data_wavelet
 
     @property
     def summary_dict(self) -> Dict[str, float]:
         """Summary dictionary of analysis metrics, including signal-to-noise ratios (SNR)."""
-        if not hasattr(self, "__summary_dict"):
+        if not hasattr(self, "_summary_dict"):
             windowed = self.highpass_fmin is not None and self.highpass_fmin > 0
 
-            self.__summary_dict = dict(
+            self._summary_dict = dict(
                 ht=self.ht,
                 gaps=self.gaps,
                 windowed= windowed,
                 noise=self.noise,
                 **self.snr_dict,
             )
-        return self.__summary_dict
+        return self._summary_dict
 
     @property
     def summary(self) -> str:
@@ -269,9 +276,9 @@ class AnalysisData:
     @property
     def snr_dict(self) -> Dict[str, float]:
         """Calculate various SNR values based on the analysis data."""
-        if not hasattr(self, "__snr_dict"):
-            self.__snr_dict = self._compute_snr_dict()
-        return self.__snr_dict
+        if not hasattr(self, "_snr_dict"):
+            self._snr_dict = self._compute_snr_dict()
+        return self._snr_dict
 
     def _compute_snr_dict(self) -> Dict[str, float]:
         """Helper to calculate and return a dictionary of SNR values."""
