@@ -61,7 +61,7 @@ def generate_stat_noise(
 ) -> Union[TimeSeries, FrequencySeries]:
     """
     Inputs  ht: TimeSeries
-            psd: FrequencySeries
+            psd_analysis: FrequencySeries
 
     Outputs stationary noise in time domain as TimeSeries object.
     """
@@ -230,18 +230,18 @@ def generate_data(
 #         gap, data_t, Nf, windowing=False, alpha=0.0, filter=False
 #     )
 
-#     psd = FrequencySeries(
+#     psd_analysis = FrequencySeries(
 #         data=CornishPowerSpectralDensity(hf.freq),
 #         freq=hf.freq
 #     )
 
 #     psd_wavelet = evolutionary_psd_from_stationary_psd(
-#         psd=psd.data, psd_f=psd.freq, f_grid=h_wavelet.freq,
+#         psd_analysis=psd_analysis.data, psd_f=psd_analysis.freq, f_grid=h_wavelet.freq,
 #         t_grid=h_wavelet.time, dt=hf.dt
 #     )
 
 #     psd_wavelet_with_gap = gap.apply_nan_gap_to_wavelet(psd_wavelet)
-#     print(f"SNR (hf, no gaps): {compute_snr_freq(hf.data, psd.data, hf.dt, hf.ND)}")
+#     print(f"SNR (hf, no gaps): {compute_snr_freq(hf.data, psd_analysis.data, hf.dt, hf.ND)}")
 #     print(f"SNR (hw, no gaps): {compute_snr(h_wavelet, psd_wavelet)}")
 
 #     # Gap data

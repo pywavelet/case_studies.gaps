@@ -1,3 +1,5 @@
+
+
 import arviz as az
 import corner
 import gif
@@ -5,7 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import trange
 
-from gap_study_utils.analysis_data import AnalysisData
+
+from ..gaps import GapType
 
 gif.options.matplotlib["dpi"] = 100
 
@@ -30,11 +33,11 @@ def plot_trace(idata: az.InferenceData, axes, i=None, max_iter=None, trues=None)
             axes[row, 1].set_xlim(0, max_iter)
 
 @gif.frame
-def _trace_mcmc_frame(idata, analysis_data: AnalysisData, i, max_iter=None):
+def _trace_mcmc_frame(idata, analysis_data: "AnalysisData", i, max_iter=None):
     plot_mcmc_summary(idata, analysis_data, max_iter)
 
 
-def plot_mcmc_summary(idata, analysis_data: AnalysisData, i=None, fname=None, frange=None, extra_info=""):
+def plot_mcmc_summary(idata, analysis_data: "AnalysisData", i=None, fname=None, frange=None, extra_info=""):
     if isinstance(idata, str):
         idata = az.from_netcdf(idata)
 
@@ -53,7 +56,7 @@ def plot_mcmc_summary(idata, analysis_data: AnalysisData, i=None, fname=None, fr
         ax=axes[3, 0],
         show_colorbar=False,
         label="Whiten Data\n",
-        whiten_by=analysis_data.psd.data,
+        whiten_by=analysis_data.psd_analysis.data,
         absolute=True,
         zscale="log",
     )
@@ -86,21 +89,50 @@ def make_mcmc_trace_gif(
     gif.save(trace_frames, fname, duration=100)
 
 
-def plot_corner(idata_fname, trues=None, fname="corner.png"):
-    idata = az.from_netcdf(idata_fname)
-    # discard burn-in
-    burnin = 0.5
-    burnin_idx = int(burnin * len(idata.sample_stats.draw))
-    idata = idata.sel(draw=slice(burnin_idx, None))
-    idata.posterior["ln_a"] = np.exp(idata.posterior.ln_a)
-    idata.posterior["ln_f"] = np.exp(idata.posterior.ln_f)
-    idata.posterior["ln_fdot"] = np.exp(idata.posterior.ln_fdot)
-    trues = trues.copy()
-    for i in range(3):
-        trues[i] = np.exp(trues[i])
 
-    corner.corner(
-        idata, truths=trues, labels=["a", "f", "fdot"], axes_scale="log"
+
+def plot_analysis_data(analysis_data:"AnalysisData", plotfn:str):
+    fig, ax = plt.subplots(6, 1, figsize=(5, 8))
+    ax[0].axis("off")
+    ax[0].text(
+        0.1, 0.5, analysis_data.summary, fontsize=8, verticalalignment="center"
     )
-    plt.savefig(fname)
 
+    analysis_data.hf.plot_periodogram(ax=ax[1], color="C0", alpha=1, lw=1)
+    analysis_data.psd_freqseries.plot(ax=ax[1], color="k", alpha=1, lw=1)
+    if analysis_data.highpass_fmin:
+        ax[1].set_xlim(left=analysis_data.highpass_fmin)
+    ax[1].set_xlim(right=analysis_data.freq[-1])
+    ax[1].tick_params(
+        axis="x",
+        direction="in",
+        labelbottom=False,
+        top=True,
+        labeltop=True,
+    )
+
+    analysis_data.ht.plot(ax=ax[2])
+    kwgs = dict(show_colorbar=False, absolute=True, zscale="log")
+    kwgs2 = dict(whiten_by=analysis_data.psd_analysis.data, **kwgs)
+    analysis_data.data_wavelet.plot(ax=ax[3], label="Data\n", **kwgs2)
+    analysis_data.hwavelet.plot(ax=ax[4], label="Model\n", **kwgs2)
+    if analysis_data.frange:
+        ax[4].axhline(analysis_data.frange[0], color="r", linestyle="--")
+        ax[4].axhline(analysis_data.frange[1], color="r", linestyle="--")
+
+    analysis_data.psd_analysis.plot(ax=ax[5], label="PSD\n", **kwgs)
+    if analysis_data.gaps:
+        if analysis_data.gaps.type == GapType.STITCH:
+            chunks = analysis_data.gaps._chunk_timeseries(
+                analysis_data.ht, alpha=analysis_data.alpha, fmin=analysis_data.highpass_fmin
+            )
+            chunksf = [c.to_frequencyseries() for c in chunks]
+            for i in range(len(chunks)):
+                chunksf[i].plot_periodogram(
+                    ax=ax[1], color=f"C{i + 1}", alpha=0.5
+                )
+                chunks[i].plot(ax=ax[2], color=f"C{i + 1}", alpha=0.5)
+        for a in ax[2:]:
+            analysis_data.gaps.plot(ax=a)
+    plt.subplots_adjust(hspace=0)
+    plt.savefig(plotfn, bbox_inches="tight")

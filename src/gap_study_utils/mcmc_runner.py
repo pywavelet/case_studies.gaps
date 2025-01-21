@@ -4,19 +4,21 @@ import warnings
 from multiprocessing import cpu_count, get_context
 from typing import List
 
-import arviz as az
 import emcee
 from eryn.prior import ProbDistContainer, uniform_dist
-import numpy as np
+
 
 from .analysis_data import AnalysisData
 from .constants import *
-from .gap_window import GapType
+from .gaps import GapType
 from .plotting import plot_corner, plot_mcmc_summary
-from .random import seed
-from .signal_utils import waveform
+from .utils.random import seed
+from .utils.signal_utils import waveform
 
 from .utils import _fmt_rutime
+from . import logger
+
+from .utils.io import save_chains_as_idata
 
 priors_in = {
     0: uniform_dist(*LN_A_RANGE),
@@ -61,7 +63,7 @@ def run_mcmc(
     highpass_fmin=None,
     frange=None,
     noise_realisation=False,
-    burnin=200,
+    burnin=100,
     n_iter=2500,
     nwalkers=32,
     random_seed=None,
@@ -108,13 +110,13 @@ def run_mcmc(
             raise ValueError(f"True parameter is not within the prior")
 
     x0 = PRIOR.rvs(size = nwalkers) 
-    print(f"Starting coordinates: , {np.median(x0, axis=0)}")
-    print(f"true values: {true_params}")
+    logger.info(f"Starting coordinates: , {np.median(x0, axis=0)}")
+    logger.info(f"true values: {true_params}")
     nwalkers, ndim = x0.shape
 
     # Check likelihood
     llike_val = log_like(true_params, analysis_data)
-    print("Value of likelihood at true values is", llike_val)
+    logger.info(f"Value of likelihood at true values is  {llike_val:.3e}")
     if noise_realisation is False and not np.isclose(llike_val, 0.0):
         warnings.warn(
             f"LnL(True values) = {llike_val:.3e} != 0.0... SUSPICIOUS!"
@@ -128,35 +130,25 @@ def run_mcmc(
         nwalkers, ndim, log_posterior, pool=pool, args=(analysis_data,)
     )
     
-    print("Running burnin phase")
+    logger.info("Running burnin phase")
     x0_after_burnin = sampler.run_mcmc(x0, burnin, progress=True)
     sampler.reset()
 
+    logger.info("Sampling")
     sampler.run_mcmc(x0_after_burnin, n_iter, progress=True)
     pool.close()
 
 
 
     runtime = time.time() - _start_time
+    idata_fname=save_chains_as_idata(sampler, runtime, outdir)
 
-    # Save the chain
-    idata_fname = os.path.join(outdir, "emcee_chain.nc")
-    idata = az.from_emcee(sampler, var_names=["ln_a", "ln_f", "ln_fdot"])
-    idata.sample_stats["runtime"] = runtime
-    idata = az.InferenceData(
-        posterior=idata.posterior,
-        sample_stats=idata.sample_stats,
-    )
-    # TODO: can i save true values here + real data?
 
-    idata.to_netcdf(idata_fname)
-    print(f"Saved chain to {idata_fname}")
-
-    print("Making plots")
-    plot_corner(idata_fname, trues=true_params, fname=f"{outdir}/corner.png")
+    logger.info("Making plots")
+    plot_corner(idata_fnames=[idata_fname], truths=true_params, plotName=f"{outdir}/corner.png")
     plot_mcmc_summary(
         idata_fname, analysis_data, fname=f"{outdir}/summary.png", frange=frange, extra_info=f"SNR={analysis_data.snr_dict['matched_filter_snr']:.2f}"
     )
-    print(f"Runtime: {_fmt_rutime(float(idata.sample_stats.runtime))}")
+    logger.info(f"Runtime: {_fmt_rutime(float(runtime))}")
 
 

@@ -1,3 +1,4 @@
+from .logger import logger
 
 
 def _fmt_rutime(t: float):

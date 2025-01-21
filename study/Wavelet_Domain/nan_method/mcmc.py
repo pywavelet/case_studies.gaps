@@ -8,7 +8,7 @@ import numpy as np
 import arviz as az
 import numpy as np
 
-from gap_study_utils.pygtc import plotGTC
+from gap_study_utils.plotting import plot_corner
 from gap_study_utils.constants import TRUES
 
 FNAMES = {
@@ -52,55 +52,64 @@ common_kwgs = dict(
 )
 
 
-def read_inference_data(file_name)->np.ndarray:
-    res = az.from_netcdf(file_name)
-    return az.sel_utils.xarray_to_ndarray(res.posterior)[1].T
-
-
-def plot_corner():
-    results = {k: read_inference_data(v) for k, v in FNAMES.items()}
-    fig = plotGTC(
-        chains=[results["basic"], results["noise"]],
-        chainLabels=["Basic", "Noise"],
-        **CORNER_KWGS
-    )
-    fig.savefig("corner_basic.png")
-    fig = plotGTC(
-        chains=[results["gap"], results["gap+noise"]],
-        chainLabels=["Gap", "Gap+noise"],
-        **CORNER_KWGS
-    )
-    fig.savefig("corner_gap.png")
+#
+# def plot_corner():
+#     results = {k: read_inference_data(v) for k, v in FNAMES.items()}
+#     fig = plotGTC(
+#         chains=[results["basic"], results["noise"]],
+#         chainLabels=["Basic", "Noise"],
+#         **CORNER_KWGS
+#     )
+#     fig.savefig("corner_basic.png")
+#     fig = plotGTC(
+#         chains=[results["gap"], results["gap+noise"]],
+#         chainLabels=["Gap", "Gap+noise"],
+#         **CORNER_KWGS
+#     )
+#     fig.savefig("corner_gap.png")
 
 
 
 
 
 if __name__ == "__main__":
-    # run_mcmc(
-    #     gap_ranges=GAPS,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/gap+noise",
-    #     **common_kwgs
-    # )
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/noise",
-    #     **common_kwgs
-    # )
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/basic",
-    #     **common_kwgs,
-    # )
-    #
-    # run_mcmc(
-    #     gap_ranges=GAPS,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/gap",
-    #     **common_kwgs
-    # )
+    run_mcmc(
+        gap_ranges=None,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/noise",
+        **common_kwgs
+    )
+    run_mcmc(
+        gap_ranges=None,
+        noise_realisation=False,
+        outdir=f"{OUTDIR}/basic",
+        **common_kwgs,
+    )
 
-    plot_corner()
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise_realisation=False,
+        outdir=f"{OUTDIR}/gap",
+        **common_kwgs
+    )
+
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/gap+noise",
+        **common_kwgs
+    )
+
+    fig = plot_corner(
+        idata_fnames=[FNAMES["basic"],FNAMES["noise"]],
+        chainLabels=["Basic", "Noise"],
+        **CORNER_KWGS
+    )
+    fig.savefig("corner_basic.png")
+
+    fig = plot_corner(
+        idata_fnames=[FNAMES["gap"], FNAMES["gap+noise"]],
+        chainLabels=["Gap", "Gap+noise"],
+        **CORNER_KWGS
+    )
+    fig.savefig("corner_gap.png")

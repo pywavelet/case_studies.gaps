@@ -1,4 +1,4 @@
-from enum import Enum
+
 from typing import List, Tuple, Union
 
 import matplotlib.pyplot as plt
@@ -6,22 +6,8 @@ import numpy as np
 from pywavelet.types.wavelet_bins import compute_bins
 from pywavelet.types import TimeSeries, Wavelet
 from pywavelet.types.plotting import _fmt_time_axis
+from .gap_type import GapType
 
-
-class GapType(Enum):
-    STITCH = 1
-    RECTANGULAR_WINDOW = 2
-
-    def __repr__(self):
-        # name without the class name
-        return self.name.split(".")[-1]
-
-    def __str__(self):
-        return self.__repr__()
-
-    @staticmethod
-    def all_types() -> List["GapType"]:
-        return [*GapType]
 
 
 class GapWindow:

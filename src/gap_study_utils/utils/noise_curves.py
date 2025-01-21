@@ -4,6 +4,7 @@ import numpy as np
 from pywavelet.types import FrequencySeries, TimeSeries
 
 from .random import rng
+from .logger import logger
 
 
 def CornishPowerSpectralDensity(f: np.ndarray) -> FrequencySeries:
@@ -69,7 +70,7 @@ def noise_PSD_AE(f: np.ndarray, TDI="TDI1"):
 def generate_stationary_noise(
     ND: int, dt: float, psd: FrequencySeries, time_domain: bool = False
 ) -> Union[TimeSeries, FrequencySeries]:
-    print("Generating stationary noise...")
+    logger.info(f"Generating stationary noise [{rng}]")
 
     variance_f = (
         ND * psd.data / (4 * dt)
