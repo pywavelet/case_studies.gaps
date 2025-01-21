@@ -12,7 +12,7 @@ from .analysis_data import AnalysisData
 from .constants import *
 from .gaps import GapType
 from .plotting import plot_corner, plot_mcmc_summary
-from .utils.random import seed
+import numpy as np
 from .utils.signal_utils import waveform
 
 from .utils import _fmt_rutime
@@ -42,15 +42,22 @@ def sample_prior(prior_container, n_samples=1) -> np.ndarray:
     return np.array(list(prior_container.rvs(size=n_samples),1)).T
 
 
-def log_like(theta: List[float], analysis_data: AnalysisData) -> float:
-    return analysis_data.lnl(*theta)
+def log_like(theta: List[float], analysis_data: AnalysisData, frequency_domain_analysis) -> float:
+    if not frequency_domain_analysis:
+        _lnl = analysis_data.lnl(*theta)
+    else:
+        _lnl = analysis_data.freqdomain_lnl(*theta)
+    return _lnl
 
-def log_posterior(theta: List[float], analysis_data: AnalysisData) -> float:
+def log_posterior(theta: List[float], analysis_data: AnalysisData, frequency_domain_analysis=False) -> float:
     _lp = log_prior(theta)
     if not np.isfinite(_lp):
         return -np.inf
     else:
-        _lnl = analysis_data.lnl(*theta)
+        if not frequency_domain_analysis:
+            _lnl = analysis_data.lnl(*theta)
+        else:
+            _lnl = analysis_data.freqdomain_lnl(*theta)
         return _lp + _lnl
 
 def run_mcmc(
@@ -67,6 +74,7 @@ def run_mcmc(
     n_iter=2500,
     nwalkers=32,
     random_seed=None,
+    frequency_domain_analysis=False,
     outdir="out_mcmc",
 ):
     """
@@ -88,7 +96,7 @@ def run_mcmc(
     _start_time = time.time()
     os.makedirs(outdir, exist_ok=True)
     if random_seed is not None:
-        seed(random_seed)
+        np.random.seed(random_seed)
     analysis_data = AnalysisData(
         data_kwargs=dict(
             dt=dt,
@@ -98,6 +106,7 @@ def run_mcmc(
             frange=frange,
             alpha=alpha,
             Nf=Nf,
+            seed=random_seed,
         ),
         gap_kwargs=dict(type=GapType.STITCH, gap_ranges=gap_ranges),
         waveform_generator=waveform,
@@ -115,11 +124,13 @@ def run_mcmc(
     nwalkers, ndim = x0.shape
 
     # Check likelihood
-    llike_val = log_like(true_params, analysis_data)
-    logger.info(f"Value of likelihood at true values is  {llike_val:.3e}")
-    if noise_realisation is False and not np.isclose(llike_val, 0.0):
+    llike_f = log_like(true_params, analysis_data, frequency_domain_analysis=True)
+    llike_wdm = log_like(true_params, analysis_data, frequency_domain_analysis=False)
+    logger.info(f"Value of likelihood[freq] at true values is  {llike_f:.3e}")
+    logger.info(f"Value of likelihood[time-freq] at true values is  {llike_wdm:.3e}")
+    if noise_realisation is False and not np.isclose(llike_wdm, 0.0):
         warnings.warn(
-            f"LnL(True values) = {llike_val:.3e} != 0.0... SUSPICIOUS!"
+            f"LnL(True values) = {llike_wdm:.3e} != 0.0... SUSPICIOUS!"
         )
 
     N_cpus = cpu_count()
@@ -127,7 +138,7 @@ def run_mcmc(
     
 
     sampler = emcee.EnsembleSampler(
-        nwalkers, ndim, log_posterior, pool=pool, args=(analysis_data,)
+        nwalkers, ndim, log_posterior, pool=pool, args=(analysis_data,frequency_domain_analysis,)
     )
     
     logger.info("Running burnin phase")

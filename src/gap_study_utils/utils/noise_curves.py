@@ -2,8 +2,6 @@ from typing import Union
 
 import numpy as np
 from pywavelet.types import FrequencySeries, TimeSeries
-
-from .random import rng
 from .logger import logger
 
 
@@ -68,9 +66,13 @@ def noise_PSD_AE(f: np.ndarray, TDI="TDI1"):
 
 
 def generate_stationary_noise(
-    ND: int, dt: float, psd: FrequencySeries, time_domain: bool = False
+    ND: int, dt: float, psd: FrequencySeries, time_domain: bool = False, seed=None
 ) -> Union[TimeSeries, FrequencySeries]:
-    logger.info(f"Generating stationary noise [{rng}]")
+
+    if seed is not None:
+        np.random.seed(seed)
+
+    logger.info(f"Generating stationary noise...")
 
     variance_f = (
         ND * psd.data / (4 * dt)
@@ -82,8 +84,8 @@ def generate_stationary_noise(
 
 
     # Generate noise in frequency domain
-    real_noise_f = rng.normal(0, np.sqrt(variance_f))
-    imag_noise_f = rng.normal(0, np.sqrt(variance_f))
+    real_noise_f = np.random.normal(0, np.sqrt(variance_f))
+    imag_noise_f = np.random.normal(0, np.sqrt(variance_f))
     noise_f = real_noise_f + 1j * imag_noise_f
 
     # Real process (positive frequencies).

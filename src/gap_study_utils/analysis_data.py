@@ -38,6 +38,7 @@ class AnalysisData:
             "highpass_fmin": None,
             "frange": None,
             "noise": False,
+            "seed": None,
         }
         gap_kwargs = {
             "type": GapType.STITCH,
@@ -81,9 +82,12 @@ class AnalysisData:
         self.highpass_fmin = self.data_kwargs.get("highpass_fmin", None)  # HARD CODED
         self.frange = self.data_kwargs.get("frange", None)
         self.noise = self.data_kwargs.get("noise", False)
+        self.seed = self.data_kwargs.get("seed", None)
         self.ND = int(self.tmax / self.dt)
         self.time = np.arange(0, self.tmax, self.dt)
         self.freq = np.fft.rfftfreq(self.ND, d=self.dt)
+        if self.seed:
+            np.random.seed(self.seed)
 
     def _initialize_grids(self):
         """Compute time and frequency grids for wavelet analysis."""
@@ -172,7 +176,7 @@ class AnalysisData:
         if not hasattr(self, "_noise_frequencyseries"):
             self._noise_frequencyseries = (
                 generate_stationary_noise(
-                    ND=self.ND, dt=self.dt, psd=self.psd_freqseries
+                    ND=self.ND, dt=self.dt, psd=self.psd_freqseries,
                 )
                 if self.noise
                 else FrequencySeries._EMPTY(self.Nf, self.Nt)
@@ -326,7 +330,6 @@ class AnalysisData:
             ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
         if self.gaps is not None:
             ht.data[self.gaps.gap_bools] = 0
-
         signal_f = ht.to_frequencyseries().data
         variance_noise_f = (
                 self.ND * self.psd_freqseries.data / (4 * self.dt)

@@ -49,6 +49,7 @@ common_kwgs = dict(
     tmax=TMAX,
     frange=[0.002, 0.007],
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
+    random_seed=0,
 )
 
 
@@ -73,43 +74,59 @@ common_kwgs = dict(
 
 
 if __name__ == "__main__":
-    run_mcmc(
-        gap_ranges=None,
-        noise_realisation=True,
-        outdir=f"{OUTDIR}/noise",
-        **common_kwgs
-    )
+    # run_mcmc(
+    #     gap_ranges=None,
+    #     noise_realisation=True,
+    #     outdir=f"{OUTDIR}/noise_fd",
+    #     frequency_domain_analysis=True,
+    #     **common_kwgs
+    # )
     run_mcmc(
         gap_ranges=None,
         noise_realisation=False,
-        outdir=f"{OUTDIR}/basic",
-        **common_kwgs,
-    )
-
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=False,
-        outdir=f"{OUTDIR}/gap",
+        outdir=f"{OUTDIR}/basic_fd",
+        frequency_domain_analysis=True,
         **common_kwgs
     )
 
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=True,
-        outdir=f"{OUTDIR}/gap+noise",
-        **common_kwgs
-    )
-
-    fig = plot_corner(
-        idata_fnames=[FNAMES["basic"],FNAMES["noise"]],
-        chainLabels=["Basic", "Noise"],
-        **CORNER_KWGS
-    )
-    fig.savefig("corner_basic.png")
-
-    fig = plot_corner(
-        idata_fnames=[FNAMES["gap"], FNAMES["gap+noise"]],
-        chainLabels=["Gap", "Gap+noise"],
-        **CORNER_KWGS
-    )
-    fig.savefig("corner_gap.png")
+    #
+    # run_mcmc(
+    #     gap_ranges=None,
+    #     noise_realisation=True,
+    #     outdir=f"{OUTDIR}/noise",
+    #     **common_kwgs
+    # )
+    # run_mcmc(
+    #     gap_ranges=None,
+    #     noise_realisation=False,
+    #     outdir=f"{OUTDIR}/basic",
+    #     **common_kwgs,
+    # )
+    #
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=False,
+    #     outdir=f"{OUTDIR}/gap",
+    #     **common_kwgs
+    # )
+    #
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=True,
+    #     outdir=f"{OUTDIR}/gap+noise",
+    #     **common_kwgs
+    # )
+    #
+    # fig = plot_corner(
+    #     idata_fnames=[FNAMES["basic"],FNAMES["noise"]],
+    #     chainLabels=["Basic", "Noise"],
+    #     **CORNER_KWGS
+    # )
+    # fig.savefig("corner_basic.png")
+    #
+    # fig = plot_corner(
+    #     idata_fnames=[FNAMES["gap"], FNAMES["gap+noise"]],
+    #     chainLabels=["Gap", "Gap+noise"],
+    #     **CORNER_KWGS
+    # )
+    # fig.savefig("corner_gap.png")
