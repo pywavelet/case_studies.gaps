@@ -326,8 +326,8 @@ class AnalysisData:
 
     def freqdomain_lnl(self, *args) -> float:
         ht = self.waveform_generator(*args, t=self.time)
-        if self.highpass_fmin:
-            ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
+        # if self.highpass_fmin:
+        #     ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
         if self.gaps is not None:
             ht.data[self.gaps.gap_bools] = 0
         signal_f = ht.to_frequencyseries().data

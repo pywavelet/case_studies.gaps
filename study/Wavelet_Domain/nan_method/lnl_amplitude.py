@@ -101,6 +101,11 @@ def main(N_points=50):
         psd_freq=clean_data.psd_freqseries.data
     )
 
+
+
+    assert clean_data.freqdomain_lnl(LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE) == clean_data.lnl(LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE)
+
+
     lnls = calculate_lnls(clean_data, ln_a_range)
     lnls_noisy = calculate_lnls(noisy_data, ln_a_range)
     lnls_f = calculate_lnls(clean_data, ln_a_range, freq_domain=True)
