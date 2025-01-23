@@ -18,6 +18,7 @@ FNAMES = {
     "gap": "out_mcmc/gap/emcee_chain.nc",
     "noise": "out_mcmc/noise/emcee_chain.nc",
     "gap+noise": "out_mcmc/gap+noise/emcee_chain.nc",
+    "gap+noise+filtering": "out_mcmc/gap+noise+filtering/emcee_chain.nc",
 }
 
 CORNER_KWGS = dict(
@@ -26,10 +27,6 @@ CORNER_KWGS = dict(
     figureSize="MNRAS_page",
     customLegendFont={"size": 20},
 )
-
-
-
-
 
 np.random.seed(1234)
 
@@ -45,8 +42,6 @@ GAPS = [
 
 common_kwgs = dict(
     n_iter=NITER,
-    alpha=0.2,
-    highpass_fmin=1e-4,# * F_TRUE / 4,
     dt=DT,
     tmax=TMAX,
     frange=[0.002, 0.007],
@@ -55,55 +50,65 @@ common_kwgs = dict(
 )
 
 
+def main_freq_domain_mcmc():
+    run_mcmc(
+        gap_ranges=None,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/noise_fd",
+        frequency_domain_analysis=True,
+        **common_kwgs
+    )
+    run_mcmc(
+        gap_ranges=None,
+        noise_realisation=False,
+        outdir=f"{OUTDIR}/basic_fd",
+        frequency_domain_analysis=True,
+        **common_kwgs
+    )
 
 
-if __name__ == "__main__":
-    ### FREQ DOMAIN
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/noise_fd",
-    #     frequency_domain_analysis=True,
-    #     **common_kwgs
-    # )
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/basic_fd",
-    #     frequency_domain_analysis=True,
-    #     **common_kwgs
-    # )
-    #
-    #### WDM DOMAIN
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/noise",
-    #     **common_kwgs
-    # )
-    # run_mcmc(
-    #     gap_ranges=None,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/basic",
-    #     **common_kwgs,
-    # )
-    #
-    # run_mcmc(
-    #     gap_ranges=GAPS,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/gap",
-    #     **common_kwgs
-    # )
-    #
-    # run_mcmc(
-    #     gap_ranges=GAPS,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/gap+noise",
-    #     **common_kwgs
-    # )
+def main_wdm_domain_mcmc():
+    run_mcmc(
+        gap_ranges=None,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/noise",
+        **common_kwgs
+    )
+    run_mcmc(
+        gap_ranges=None,
+        noise_realisation=False,
+        outdir=f"{OUTDIR}/basic",
+        **common_kwgs,
+    )
 
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise_realisation=False,
+        outdir=f"{OUTDIR}/gap",
+        **common_kwgs
+    )
+
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/gap+noise",
+        **common_kwgs
+    )
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/gap+noise+filtering",
+        alpha=0.2,
+        highpass_fmin=1e-4,  # * F_TRUE / 4,
+        **common_kwgs
+    )
+
+
+
+
+def make_all_corners():
     fig = plot_corner(
-        idata_fnames=[FNAMES["basic"],FNAMES["basic_fd"]],
+        idata_fnames=[FNAMES["basic"], FNAMES["basic_fd"]],
         chainLabels=["Basic [WDM]", "Basic [FD]"],
         **CORNER_KWGS,
         colorsOrder=["blues", "greens"]
@@ -111,7 +116,7 @@ if __name__ == "__main__":
     fig.savefig("corner_frqcompare_basic.png")
 
     fig = plot_corner(
-        idata_fnames=[FNAMES["noise"],FNAMES["noise_fd"]],
+        idata_fnames=[FNAMES["noise"], FNAMES["noise_fd"]],
         chainLabels=["Noise [WDM]", "Noise [FD]"],
         **CORNER_KWGS,
         colorsOrder=["blues", "greens"]
@@ -119,7 +124,7 @@ if __name__ == "__main__":
     fig.savefig("corner_frqcompare_noise.png")
 
     fig = plot_corner(
-        idata_fnames=[FNAMES["basic"],FNAMES["noise"]],
+        idata_fnames=[FNAMES["basic"], FNAMES["noise"]],
         chainLabels=["Basic", "Noise"],
         **CORNER_KWGS
     )
@@ -127,7 +132,20 @@ if __name__ == "__main__":
 
     fig = plot_corner(
         idata_fnames=[FNAMES["gap"], FNAMES["gap+noise"]],
-        chainLabels=["Gap", "Gap+noise"],
+        chainLabels=["Gap", "Gap+noise", ],
         **CORNER_KWGS
     )
     fig.savefig("corner_gap.png")
+
+    fig = plot_corner(
+        idata_fnames=[FNAMES["gap"],  FNAMES["gap+noise+filtering"]],
+        chainLabels=["Gap", "Gap+noise+filtering"],
+        **CORNER_KWGS
+    )
+    fig.savefig("corner_gap_filtering.png")
+
+
+if __name__ == "__main__":
+    # main_freq_domain_mcmc()
+    # main_wdm_domain_mcmc()
+    make_all_corners()

@@ -251,10 +251,6 @@ class AnalysisData:
         """Apply gap windowing and high-pass filtering to data time series and compute wavelet."""
         if not hasattr(self, "_data_wavelet"):
             data_timeseries = self.data_timeseries
-            if self.highpass_fmin:
-                data_timeseries = data_timeseries.highpass_filter(
-                    fmin=self.highpass_fmin, tukey_window_alpha=self.alpha
-                )
             self._data_wavelet = (
                 data_timeseries.to_wavelet(Nf=self.Nf)
                 if not self.gaps
