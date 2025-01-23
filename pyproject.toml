@@ -40,6 +40,7 @@ dependencies = [
 dev = [
     "pytest>=6.0",
     "pytest-cov>=4.1.0",
+    "jupyter-book"
 ]
 
 
