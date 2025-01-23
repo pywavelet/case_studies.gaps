@@ -26,7 +26,7 @@ dependencies = [
     "pywavelet",
     "scipy>=1.10.0", #
     "numpy",
-    "arviz>=0.18.0",
+    "arviz",
     "eryn",
     "bilby",
     "gif",
