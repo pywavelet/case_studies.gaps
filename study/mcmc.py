@@ -67,7 +67,7 @@ def main_freq_domain_mcmc():
     )
 
 
-def main_wdm_domain_mcmc():
+def main_non_gaps():
     run_mcmc(
         gap_ranges=None,
         noise_realisation=True,
@@ -81,19 +81,21 @@ def main_wdm_domain_mcmc():
         **common_kwgs,
     )
 
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=False,
-        outdir=f"{OUTDIR}/gap",
-        **common_kwgs
-    )
 
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=True,
-        outdir=f"{OUTDIR}/gap+noise",
-        **common_kwgs
-    )
+def main_wdm_domain_mcmc():
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=False,
+    #     outdir=f"{OUTDIR}/gap",
+    #     **common_kwgs
+    # )
+    #
+    # run_mcmc(
+    #     gap_ranges=GAPS,
+    #     noise_realisation=True,
+    #     outdir=f"{OUTDIR}/gap+noise",
+    #     **common_kwgs
+    # )
     run_mcmc(
         gap_ranges=GAPS,
         noise_realisation=True,
@@ -104,7 +106,14 @@ def main_wdm_domain_mcmc():
     )
 
 
-
+def main_wdm_with_masks():
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise_realisation=True,
+        outdir=f"{OUTDIR}/gap+noise+mask",
+        tgaps=[[0, 300], [TMAX * 0.47, TMAX * 0.52], [TMAX-300, TMAX]],
+        **common_kwgs
+    )
 
 def make_all_corners():
     fig = plot_corner(
@@ -147,5 +156,6 @@ def make_all_corners():
 
 if __name__ == "__main__":
     # main_freq_domain_mcmc()
-    # main_wdm_domain_mcmc()
+    main_wdm_domain_mcmc()
+    # main_wdm_with_masks()
     make_all_corners()

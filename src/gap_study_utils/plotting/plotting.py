@@ -114,13 +114,23 @@ def plot_analysis_data(analysis_data:"AnalysisData", plotfn:str):
     analysis_data.ht.plot(ax=ax[2])
     kwgs = dict(show_colorbar=False, absolute=True, zscale="log")
     kwgs2 = dict(whiten_by=analysis_data.psd_analysis.data, **kwgs)
-    analysis_data.data_wavelet.plot(ax=ax[3], label="Data\n", **kwgs2)
-    analysis_data.hwavelet.plot(ax=ax[4], label="Model\n", **kwgs2)
+
+
+    data_w = analysis_data.data_wavelet
+    hwavelet = analysis_data.hwavelet
+    psd_w = analysis_data.psd_wavelet
+    if analysis_data.mask:
+        data_w = data_w * analysis_data.mask
+        hwavelet = hwavelet * analysis_data.mask
+        psd_w = psd_w * analysis_data.mask
+
+    data_w.plot(ax=ax[3], label="Data\n", **kwgs2)
+    hwavelet.plot(ax=ax[4], label="Model\n", **kwgs2)
     if analysis_data.frange:
         ax[4].axhline(analysis_data.frange[0], color="r", linestyle="--")
         ax[4].axhline(analysis_data.frange[1], color="r", linestyle="--")
 
-    analysis_data.psd_analysis.plot(ax=ax[5], label="PSD\n", **kwgs)
+    psd_w.plot(ax=ax[5], label="PSD\n", **kwgs)
     if analysis_data.gaps:
         if analysis_data.gaps.type == GapType.STITCH:
             chunks = analysis_data.gaps._chunk_timeseries(
