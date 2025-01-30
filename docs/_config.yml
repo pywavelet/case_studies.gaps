@@ -1,0 +1,28 @@
+# see https://jupyterbook.org/customize/config.html
+title: Pywavelet.case_studies.gaps
+author: pywavelet developers
+logo: logo.png
+
+execute:
+  execute_notebooks: 'off'
+
+latex:
+  latex_documents:
+    targetname: book.tex
+
+bibtex_bibfiles:
+  - references.bib
+
+repository:
+  url: https://github.com/pywavelet/case_studies.gaps
+  path_to_book: docs
+  branch: main
+
+html:
+  use_issues_button: true
+  use_repository_button: true
+
+
+sphinx:
+  extra_extensions:
+    - sphinx.ext.autodoc
