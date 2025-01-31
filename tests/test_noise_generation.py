@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pywavelet.utils import evolutionary_psd_from_stationary_psd
 
-from gap_study_utils.noise_curves import (
+from gap_study_utils.utils.noise_curves import (
     CornishPowerSpectralDensity,
     noise_PSD_AE,
     generate_stationary_noise,
@@ -112,3 +112,20 @@ def test_noise_fluctuates_aroud_true(plot_dir):
     axes[1].set_xlabel("Frequency [Hz]")
     plt.tight_layout()
     plt.savefig(f"{plot_dir}/noise_fluctuates_around_true.png")
+
+
+
+def test_noise_models(plot_dir):
+    f = np.geomspace(1e-5, 1e-1, 1000)
+    cornish_psd = CornishPowerSpectralDensity(f)
+    tdi1_psd = noise_PSD_AE(f, TDI="TDI1")
+    tdi2_psd = noise_PSD_AE(f, TDI="TDI2")
+    plt.figure(figsize=(3.5, 3))
+    plt.loglog(cornish_psd.freq, cornish_psd.data, label="Cornish")
+    plt.loglog(tdi1_psd.freq, tdi1_psd.data, label="TDI1")
+    plt.loglog(tdi2_psd.freq, tdi2_psd.data, label="TDI2")
+    plt.ylabel("PSD [1/Hz]")
+    plt.xlabel("Frequency [Hz]")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{plot_dir}/noise_models.png")

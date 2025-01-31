@@ -82,7 +82,9 @@ class AnalysisData:
         self.alpha = self.data_kwargs.get("alpha", 0.0)
         self.highpass_fmin = self.data_kwargs.get("highpass_fmin", None)  # HARD CODED
         self.frange = self.data_kwargs.get("frange", None)
-        self.tgaps = self.data_kwargs.get("tgaps", None)
+        self.tgaps = self.data_kwargs.get("tgaps", [])
+        if self.tgaps is None:
+            self.tgaps = []
         self.noise = self.data_kwargs.get("noise", False)
         self.seed = self.data_kwargs.get("seed", None)
         self.ND = int(self.tmax / self.dt)
@@ -102,7 +104,7 @@ class AnalysisData:
 
 
         # make a mask -- only use f_grid within the frange
-        self.mask = WaveletMask.from_restrictions(time_grid=self.t_grid, freq_grid=self.f_grid, frange=self.frange)
+        self.mask = WaveletMask.from_restrictions(time_grid=self.t_grid, freq_grid=self.f_grid, frange=self.frange, tgaps=self.tgaps)
         self.zero_wavelet = Wavelet.zeros_from_grid(self.t_grid, self.f_grid)
 
     def _initialize_gap_window(self):
