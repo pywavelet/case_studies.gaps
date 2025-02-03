@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>One year of LISA data &#8212; Pywavelet.case_studies.gaps</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'one_year';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Pywavelet.case_studies.gaps</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Case Studies: Gaps
+                </a>
+            </li>
+        </ul>
+        
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/pywavelet/case_studies.gaps" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/pywavelet/case_studies.gaps/issues/new?title=Issue%20on%20page%20%2Fone_year.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/one_year.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>One year of LISA data</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mcmc">MCMC</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="one-year-of-lisa-data">
+<h1>One year of LISA data<a class="headerlink" href="#one-year-of-lisa-data" title="Permalink to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gap_study_utils.analysis_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisData</span><span class="p">,</span> <span class="n">get_suggested_tmax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gap_study_utils.utils.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">waveform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gap_study_utils.gaps.gap_funcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_gap_ranges</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gap_study_utils.gaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">GapType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gap_study_utils.mcmc_runner</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_mcmc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">LN_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e-21</span><span class="p">)</span>
+<span class="n">LN_F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.005</span><span class="p">)</span>
+<span class="n">LN_FDOT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e-9</span><span class="p">)</span>
+
+<span class="n">HOURS</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>
+<span class="n">DAYS</span> <span class="o">=</span> <span class="mi">24</span> <span class="o">*</span> <span class="n">HOURS</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">tmax</span> <span class="o">=</span> <span class="n">get_suggested_tmax</span><span class="p">(</span><span class="n">DAYS</span> <span class="o">*</span> <span class="mf">365.4</span><span class="p">)</span>
+
+<span class="n">outdir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;outdir_1year&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">gap_ranges</span> <span class="o">=</span> <span class="n">generate_gap_ranges</span><span class="p">(</span><span class="n">tmax</span><span class="p">,</span> <span class="n">gap_period</span><span class="o">=</span><span class="n">DAYS</span> <span class="o">*</span> <span class="mi">14</span><span class="p">,</span> <span class="n">gap_duration</span><span class="o">=</span><span class="n">HOURS</span> <span class="o">*</span> <span class="mi">7</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of gaps: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gap_ranges</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">AnalysisData</span><span class="p">(</span>
+    <span class="n">data_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">),</span>
+    <span class="n">gap_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">GapType</span><span class="o">.</span><span class="n">RECTANGULAR_WINDOW</span><span class="p">,</span> <span class="n">gap_ranges</span><span class="o">=</span><span class="n">gap_ranges</span><span class="p">),</span>
+    <span class="n">waveform_generator</span><span class="o">=</span><span class="n">waveform</span><span class="p">,</span>
+    <span class="n">waveform_parameters</span><span class="o">=</span><span class="p">[</span><span class="n">LN_A</span><span class="p">,</span> <span class="n">LN_F</span><span class="p">,</span> <span class="n">LN_FDOT</span><span class="p">],</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">))</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data_wavelet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">whiten_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_range</span><span class="o">=</span><span class="p">[</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.028</span><span class="p">])</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="s2">&quot;data_wavelet.png&quot;</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="outdir_1year/data_wavelet.png" src="outdir_1year/data_wavelet.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it
+
+<span class="n">data</span><span class="o">.</span><span class="n">lnl</span><span class="p">(</span><span class="n">LN_A</span><span class="p">,</span> <span class="n">LN_F</span><span class="p">,</span> <span class="n">LN_FDOT</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>400 ms ± 20.7 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="mcmc">
+<h2>MCMC<a class="headerlink" href="#mcmc" title="Permalink to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython2 notranslate"><div class="highlight"><pre><span></span><span class="n">run_mcmc</span><span class="p">(</span>
+    <span class="n">true_params</span><span class="o">=</span><span class="p">[</span><span class="n">LN_A</span><span class="p">,</span> <span class="n">LN_F</span><span class="p">,</span> <span class="n">LN_FDOT</span><span class="p">],</span>
+    <span class="n">gap_ranges</span><span class="o">=</span><span class="n">gap_ranges</span><span class="p">,</span>
+    <span class="n">gap_type</span><span class="o">=</span><span class="s2">&quot;rectangular_window&quot;</span><span class="p">,</span>
+    <span class="n">Nf</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span>
+    <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">highpass_fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">frange</span><span class="o">=</span><span class="p">[</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.028</span><span class="p">],</span>
+    <span class="n">noise_realisation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">outdir</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s2">/mcmc_no_noise&quot;</span><span class="p">,</span>
+    <span class="n">noise_curve</span><span class="o">=</span><span class="s1">&#39;TDI1&#39;</span><span class="p">,</span>
+    <span class="n">burnin</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+    <span class="n">n_iter</span><span class="o">=</span><span class="mi">250</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:02:35] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Initalizing GapWindow with RECTANGULAR_WINDOW gaps <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">17</span> gaps<span style="font-weight: bold">)</span>.              <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/analysis_data.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">analysis_data.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/analysis_data.py#125" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">125</span></a>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:02:36] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> AnalysisData initialized.                                                   <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/analysis_data.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">analysis_data.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/analysis_data.py#81" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">81</span></a>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:02:37] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> ht: <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">TimeSeries</span><span style="font-weight: bold">(</span><span style="color: #808000; text-decoration-color: #808000">n</span>=<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>^<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">21</span>, <span style="color: #808000; text-decoration-color: #808000">trange</span>=<span style="font-weight: bold">[</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.00</span>, <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">242.73</span><span style="font-weight: bold">]</span> day, <span style="color: #808000; text-decoration-color: #808000">T</span>=<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">242.73</span> day, <span style="color: #808000; text-decoration-color: #808000">fs</span>=<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">0.10</span> Hz<span style="font-weight: bold">)</span> <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/analysis_data.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">analysis_data.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/analysis_data.py#82" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">82</span></a>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         gaps: <span style="color: #800080; text-decoration-color: #800080; font-weight: bold">GapWindow</span><span style="font-weight: bold">(</span>RECTANGULAR_WINDOW, <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">42</span>,<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">823</span>/<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span>,<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">097</span>,<span style="color: #008080; text-decoration-color: #008080; font-weight: bold">152</span> NaNs<span style="font-weight: bold">)</span>                  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         windowed: <span style="color: #ff0000; text-decoration-color: #ff0000; font-style: italic">False</span>                                                             <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         noise: <span style="color: #ff0000; text-decoration-color: #ff0000; font-style: italic">False</span>                                                                <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         optimal_snr: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">544.25</span>                                                         <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         matched_filter_snr: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">544.25</span>                                                  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         optimal_wavelet_snr: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">504.43</span>                                                 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         matched_filter_wavelet_snr: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">493.9</span>                                           <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         optimal_data_wavelet_snr: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">494.5</span>                                             <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+<span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span>         matched_filter_data_wavelet_snr: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">494.5</span>                                      <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">                   </span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Starting coordinates: , <span style="font-weight: bold">[</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">-48.33850416</span>  <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">-5.29831841</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">-20.7232853</span> <span style="font-weight: bold">]</span>             <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#114" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">114</span></a>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> true values: <span style="font-weight: bold">[</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">-48.35428695287496</span>, <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">-5.298317366548036</span>, <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">-20.72326583694641</span><span style="font-weight: bold">]</span>    <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#115" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">115</span></a>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Value of likelihood<span style="font-weight: bold">[</span>time-freq<span style="font-weight: bold">]</span> at true values is  <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1.864e+01</span>                  <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#120" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">120</span></a>
+</pre>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Python(34791) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34792) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34793) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34794) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34795) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34796) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34797) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34798) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34799) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34800) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34801) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+Python(34802) MallocStackLogging: can&#39;t turn off malloc stack logging because it was not enabled.
+</pre></div>
+</div>
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:02:38] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Running burnin phase                                                         <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#132" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">132</span></a>
+</pre>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 150/150 [15:06&lt;00:00,  6.04s/it]
+</pre></div>
+</div>
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:17:50] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Sampling                                                                     <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#136" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">136</span></a>
+</pre>
+</div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 250/250 [29:55&lt;00:00,  7.18s/it]
+</pre></div>
+</div>
+<div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:47:47] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Saved chain to outdir_1year/mcmc_no_noise/emcee_chain.nc                               <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/utils/io.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">io.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/utils/io.py#28" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">28</span></a>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">           </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Making plots                                                                 <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#145" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">145</span></a>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7fbfbf; text-decoration-color: #7fbfbf">[16:47:55] </span><span style="color: #000080; text-decoration-color: #000080">INFO    </span> Runtime: 45m11s                                                              <a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">mcmc_runner.py</span></a><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">:</span><a href="file:///Users/avaj0001/Documents/projects/pywavelet/case_studies.gaps/src/gap_study_utils/mcmc_runner.py#150" target="_blank"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">150</span></a>
+</pre>
+</div><img alt="_images/1ab7b82bbf9699b49aaa8a65ecbe384cccda4db76f53e8c28d3aa3cd076dac45.png" src="_images/1ab7b82bbf9699b49aaa8a65ecbe384cccda4db76f53e8c28d3aa3cd076dac45.png" />
+<img alt="_images/53db71ee3279e8fe93dc049ee4502be63aeaf1344cf4062ea603549f6af76d39.png" src="_images/53db71ee3279e8fe93dc049ee4502be63aeaf1344cf4062ea603549f6af76d39.png" />
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mcmc">MCMC</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By pywavelet developers
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
