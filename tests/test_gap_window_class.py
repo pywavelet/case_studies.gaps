@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from gap_study_utils.gap_window import GapType, GapWindow, TimeSeries
+from gap_study_utils.gaps import GapType, GapWindow
+from pywavelet.types import TimeSeries
 
 
 def test_gap_window(plot_dir):

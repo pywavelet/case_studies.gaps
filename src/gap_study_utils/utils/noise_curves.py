@@ -4,6 +4,21 @@ import numpy as np
 from pywavelet.types import FrequencySeries, TimeSeries
 from .logger import logger
 
+def noise_curve(f: np.ndarray, noise_type: str) -> FrequencySeries:
+    """
+    Generate noise curve for a given noise type
+    """
+
+    if noise_type in ["TDI1", "TDI2"]:
+        return noise_PSD_AE(f, TDI="TDI2")
+    elif noise_type == "Cornish":
+        return CornishPowerSpectralDensity(f)
+    else:
+        raise ValueError(
+            f"Unknown noise type: {noise_type}. "
+            f"Supported types are: TDI1, TDI2, Cornish."
+        )
+
 
 def CornishPowerSpectralDensity(f: np.ndarray) -> FrequencySeries:
     """
@@ -72,7 +87,7 @@ def generate_stationary_noise(
     if seed is not None:
         np.random.seed(seed)
 
-    logger.info(f"Generating stationary noise...")
+    logger.info(f"Generating stationary noise... [Seed:{seed}]")
 
     variance_f = (
         ND * psd.data / (4 * dt)

@@ -10,6 +10,23 @@ from scipy.signal.windows import tukey
 
 ONE_HOUR = 60 * 60
 
+def generate_gap_ranges(tmax:float, gap_period:float, gap_duration:float):
+    """
+    Create a list of gap ranges for a given time vector.
+
+    Returns:
+        List[Tuple[float, float]]: List of gap ranges
+    """
+    gap_ranges = []
+    n_gaps = int(tmax / gap_period)
+    for i in range(n_gaps):
+        gap_start = i * gap_period
+        gap_end = gap_start + gap_duration
+        gap_ranges.append([gap_start, gap_end])
+    return gap_ranges
+
+
+
 
 def gap_routine(
     t: np.ndarray,

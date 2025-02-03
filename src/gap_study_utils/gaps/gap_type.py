@@ -15,3 +15,8 @@ class GapType(Enum):
     @staticmethod
     def all_types() -> List["GapType"]:
         return [*GapType]
+
+
+    @classmethod
+    def parse(cls, value: str) -> "GapType":
+        return GapType[value.upper()]

@@ -9,11 +9,14 @@ from pywavelet.utils import (
     evolutionary_psd_from_stationary_psd,
 )
 
+
+from eryn.prior import ProbDistContainer, uniform_dist
+
+
 from .constants import DT, GAP_RANGES, NF, TMAX, TRUES
 from .gaps import GapType, GapWindow
 from .utils.noise_curves import (
-    CornishPowerSpectralDensity,
-    noise_PSD_AE,
+    noise_curve,
     generate_stationary_noise,
 )
 from .utils.signal_utils import waveform, compute_snr_dict
@@ -40,6 +43,7 @@ class AnalysisData:
             "tgaps": None,
             "noise": False,
             "seed": None,
+            "noise_curve": "TDI1",
         }
         gap_kwargs = {
             "type": GapType.STITCH,
@@ -69,11 +73,16 @@ class AnalysisData:
         self._initialize_gap_window()
 
         if plotfn:
-            self.plot_data(plotfn)
+            _ = self.plot_data(plotfn)
+
+
+        self.priors:ProbDistContainer = construct_prior(self.waveform_parameters)
 
         logger.info("AnalysisData initialized.")
         logger.info(self.summary)
 
+    def log_prior(self, theta: List[float]) -> float:
+        return self.priors.logpdf(theta)
 
     def _initialize_data_params(self):
         """Initialize core data parameters from `data_kwargs` with default values."""
@@ -86,6 +95,7 @@ class AnalysisData:
         if self.tgaps is None:
             self.tgaps = []
         self.noise = self.data_kwargs.get("noise", False)
+        self.noise_curve = self.data_kwargs.get("noise_curve", "TDI1")
         self.seed = self.data_kwargs.get("seed", None)
         self.ND = int(self.tmax / self.dt)
         self.time = np.arange(0, self.tmax, self.dt)
@@ -109,9 +119,10 @@ class AnalysisData:
 
     def _initialize_gap_window(self):
         """Set up the gap window if `gap_kwargs` are provided."""
-        gap_ranges = self.gap_kwargs.get("gap_ranges", None)
+        gap_ranges = self.gap_kwargs.get("gap_ranges", [])
         gap_type = self.gap_kwargs.get("type", GapType.STITCH)
         if gap_ranges:
+            logger.info(f"Initalizing GapWindow with {gap_type} gaps ({len(gap_ranges)} gaps).")
             self.gaps = GapWindow(
                 self.time, tmax=self.tmax, gap_ranges=gap_ranges, type=gap_type
             )
@@ -125,14 +136,14 @@ class AnalysisData:
     @ND.setter
     def ND(self, n: int):
         """Ensure ND is a power of 2, raising an error with a suggestion if it is not."""
-        n_pwr_2 = 2 ** int(np.log2(n))
+        n_pwr_2 = round_to_nearest_pow_of_2(n)
         if n != n_pwr_2:
-            suggestion = dict(dt=self.dt, tmax=n_pwr_2 * self.dt)
-            current = dict(dt=self.dt, tmax=self.tmax)
+            suggested_tmax = n_pwr_2 * self.dt
             raise ValueError(
-                f"ND must be a power of 2."
-                f"Current settings:\n\t {current}\n"
-                f"Suggested settings:\n\t {suggestion}"
+                f"ND must be a power of 2. "
+                f"Given dt={self.dt}, \n"
+                f"suggested tmax={suggested_tmax} --> [n=2^{np.log2(n_pwr_2)}],  \n"
+                f"current tmax={self.tmax} --> [n=2^{np.log2(n):.2f}]"
             )
         self._ND = n
 
@@ -140,7 +151,7 @@ class AnalysisData:
     def psd_freqseries(self) -> FrequencySeries:
         """Generate the frequency series PSD if it hasn't been computed."""
         if not hasattr(self, "_psd_freqseries"):
-            self._psd_freqseries = CornishPowerSpectralDensity(self.freq)
+            self._psd_freqseries = noise_curve(self.freq, self.noise_curve)
         return self._psd_freqseries
 
     @property
@@ -174,6 +185,28 @@ class AnalysisData:
             )
 
         return self._ht
+
+
+    @property
+    def chunked_ht(self) -> List[TimeSeries]:
+        """Chunk the time series if gaps are present."""
+        if not hasattr(self, "_chunked_ht"):
+            if self.gaps and self.gaps.type == GapType.STITCH:
+                self._chunked_ht = self.gaps._chunk_timeseries(
+                    self.ht,alpha=self.alpha, fmin=self.highpass_fmin,
+            )
+            else:
+                self._chunked_ht = [self.ht]
+        return self._chunked_ht
+
+    @property
+    def chunked_hf(self):
+        """Chunk the frequency series if gaps are present."""
+        if not hasattr(self, "_chunked_hf"):
+            self._chunked_hf = [
+                ts.to_frequencyseries() for ts in self.chunked_ht
+            ]
+        return self._chunked_hf
 
     @property
     def noise_frequencyseries(self) -> FrequencySeries:
@@ -298,9 +331,9 @@ class AnalysisData:
 
 
 
-    def plot_data(self, plotfn: str):
+    def plot_data(self, plotfn: str=None, **kwargs):
         """Plot data visualizations including SNR information, time series, wavelet, and PSDs."""
-        return plot_analysis_data(self, plotfn)
+        return plot_analysis_data(self, plotfn, **kwargs)
 
     def htemplate(self, *args, **kwargs) -> Wavelet:
         ht = self.waveform_generator(*args, **kwargs, t=self.time)
@@ -325,6 +358,13 @@ class AnalysisData:
             self.data_wavelet, self.zero_wavelet, self.psd_analysis, self.mask
         )
 
+    def ln_posterior(self, theta:List[float]) -> float:
+        ln_prior = self.log_prior(np.array(theta))
+        if ln_prior == -np.inf:
+            return -np.inf
+        return ln_prior + self.lnl(*theta)
+
+
     def freqdomain_lnl(self, *args) -> float:
         ht = self.waveform_generator(*args, t=self.time)
         # if self.highpass_fmin:
@@ -337,3 +377,27 @@ class AnalysisData:
         )  # Calculate variance of noise, real and imaginary.
         inn_prod = sum((abs(self.data_frequencyseries.data - signal_f) ** 2) / variance_noise_f)
         return -0.5 * inn_prod
+
+
+
+def round_to_nearest_pow_of_2(n: int) -> int:
+    return 2 ** int(np.log2(n))
+
+
+def get_suggested_tmax(tmax:float) -> float:
+    n = round_to_nearest_pow_of_2(tmax / DT)
+    return n * DT
+
+
+def construct_prior(trues) -> ProbDistContainer:
+    ln_a, ln_f, ln_fdot = trues
+    lna_range = [ln_a - 0.1, ln_a + 0.1]
+    lnf_range = [ln_f - 0.0001, ln_f + 0.0001]
+    lnfdot_range = [ln_fdot - 0.0001, ln_fdot + 0.0001]
+    return ProbDistContainer({
+        0: uniform_dist(*lna_range),
+        1: uniform_dist(*lnf_range),
+        2: uniform_dist(*lnfdot_range)
+    })
+
+

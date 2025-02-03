@@ -5,8 +5,8 @@ from multiprocessing import cpu_count, get_context
 from typing import List
 
 import emcee
-from eryn.prior import ProbDistContainer, uniform_dist
 
+from multiprocessing import Pool
 
 from .analysis_data import AnalysisData
 from .constants import *
@@ -20,49 +20,19 @@ from . import logger
 
 from .utils.io import save_chains_as_idata
 
-priors_in = {
-    0: uniform_dist(*LN_A_RANGE),
-    1: uniform_dist(*LN_F_RANGE),
-    2: uniform_dist(*LN_FDOT_RANGE)
-}  
-
-PRIOR = ProbDistContainer(priors_in)   # Set up priors so they can be used with the sampler.
-
-def log_prior(theta):
-    ln_a, ln_f, ln_fdot = theta
-    _lnp = PRIOR.logpdf(np.array([ln_a, ln_f, ln_fdot]))
-    if not np.isfinite(_lnp):
-        return -np.inf
-    else:
-        return 0.0
 
 
-def sample_prior(prior_container, n_samples=1) -> np.ndarray:
-    """Return (nsamp, ndim) array of samples"""
-    return np.array(list(prior_container.rvs(size=n_samples),1)).T
 
+# make data global
+DATA:AnalysisData = None
 
-def log_like(theta: List[float], analysis_data: AnalysisData, frequency_domain_analysis) -> float:
-    if not frequency_domain_analysis:
-        _lnl = analysis_data.lnl(*theta)
-    else:
-        _lnl = analysis_data.freqdomain_lnl(*theta)
-    return _lnl
-
-def log_posterior(theta: List[float], analysis_data: AnalysisData, frequency_domain_analysis=False) -> float:
-    _lp = log_prior(theta)
-    if not np.isfinite(_lp):
-        return -np.inf
-    else:
-        if not frequency_domain_analysis:
-            _lnl = analysis_data.lnl(*theta)
-        else:
-            _lnl = analysis_data.freqdomain_lnl(*theta)
-        return _lp + _lnl
+def _lnp(theta:List[float]):
+    return DATA.ln_posterior(theta)
 
 def run_mcmc(
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
     gap_ranges=GAP_RANGES,
+    gap_type="stitch",
     Nf=NF,
     tmax=TMAX,
     dt=DT,
@@ -71,12 +41,14 @@ def run_mcmc(
     frange=None,
     tgaps=None,
     noise_realisation=False,
+    noise_curve='TDI1',
     burnin=75,
     n_iter=100,
     nwalkers=32,
     random_seed=None,
     frequency_domain_analysis=False,
     outdir="out_mcmc",
+    data_plots=False,
 ):
     """
     Run MCMC on the data generated with the given parameters.
@@ -98,6 +70,10 @@ def run_mcmc(
     os.makedirs(outdir, exist_ok=True)
     if random_seed is not None:
         np.random.seed(random_seed)
+
+    if gap_type is not None:
+        gap_type = GapType.parse(gap_type)
+
     analysis_data = AnalysisData(
         data_kwargs=dict(
             dt=dt,
@@ -109,26 +85,38 @@ def run_mcmc(
             alpha=alpha,
             Nf=Nf,
             seed=random_seed,
+            noise_curve=noise_curve,
         ),
-        gap_kwargs=dict(type=GapType.STITCH, gap_ranges=gap_ranges),
+        gap_kwargs=dict(type=gap_type, gap_ranges=gap_ranges),
         waveform_generator=waveform,
         waveform_parameters=true_params,
-        plotfn=f"{outdir}/data.png",
     )
+    if data_plots:
+        analysis_data.plot_data(plotfn=f"{outdir}/data.png")
+
+
+    global DATA
+    DATA = analysis_data
+
+
     if true_params:
         # check that the true parameters are within the prior
-        if PRIOR.logpdf(np.array(true_params)) == -np.inf:
+        if analysis_data.log_prior(np.array(true_params)) == -np.inf:
             raise ValueError(f"True parameter is not within the prior")
 
-    x0 = PRIOR.rvs(size = nwalkers) 
-    logger.info(f"Starting coordinates: , {np.median(x0, axis=0)}")
-    logger.info(f"true values: {true_params}")
+    x0 = analysis_data.priors.rvs(size = nwalkers)
+    # repeat the true parameters for all walkers
+    # x0 = np.repeat(np.array(true_params).reshape(1, -1), nwalkers, axis=0)
+
+    if (x0 == true_params).all():
+        logger.info("True values are the starting coordinates")
+    else:
+        logger.info(f"Starting coordinates: , {np.median(x0, axis=0)}")
+        logger.info(f"true values: {true_params}")
     nwalkers, ndim = x0.shape
 
     # Check likelihood
-    llike_f = log_like(true_params, analysis_data, frequency_domain_analysis=True)
-    llike_wdm = log_like(true_params, analysis_data, frequency_domain_analysis=False)
-    logger.info(f"Value of likelihood[freq] at true values is  {llike_f:.3e}")
+    llike_wdm = analysis_data.ln_posterior(true_params)
     logger.info(f"Value of likelihood[time-freq] at true values is  {llike_wdm:.3e}")
     if noise_realisation is False and not np.isclose(llike_wdm, 0.0):
         warnings.warn(
@@ -136,20 +124,17 @@ def run_mcmc(
         )
 
     N_cpus = cpu_count()
-    pool = get_context("fork").Pool(N_cpus)
-    
 
-    sampler = emcee.EnsembleSampler(
-        nwalkers, ndim, log_posterior, pool=pool, args=(analysis_data,frequency_domain_analysis,)
-    )
-    
-    logger.info("Running burnin phase")
-    x0_after_burnin = sampler.run_mcmc(x0, burnin, progress=True)
-    sampler.reset()
+    with get_context("fork").Pool(N_cpus) as pool:
+        sampler = emcee.EnsembleSampler(
+            nwalkers, ndim, _lnp, pool=pool
+        )
+        logger.info("Running burnin phase")
+        x0_after_burnin = sampler.run_mcmc(x0, burnin, progress=True)
+        sampler.reset()
 
-    logger.info("Sampling")
-    sampler.run_mcmc(x0_after_burnin, n_iter, progress=True)
-    pool.close()
+        logger.info("Sampling")
+        sampler.run_mcmc(x0_after_burnin, n_iter, progress=True)
 
 
 

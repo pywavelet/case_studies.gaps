@@ -11,16 +11,15 @@ from gap_study_utils.constants import (
     GAP_RANGES,
     TMAX,
 )
-from gap_study_utils.gap_window import GapType
-from gap_study_utils.random import seed
-from gap_study_utils.signal_utils import waveform
+from gap_study_utils.gaps import GapType
+from gap_study_utils.utils.signal_utils import waveform
 
 
 # parameterize gap_type and noise
 @pytest.mark.parametrize("gap_type", GapType.all_types())
 @pytest.mark.parametrize("noise", [True, False])
 def test_analysis_data(plot_dir, gap_type, noise):
-    seed(0)
+    np.random.seed(0)
     dt = 10
     tmax = 655360
     gap_ranges = GAP_RANGES

@@ -6,7 +6,7 @@ import gif
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.auto import trange
-
+from xarray.ufuncs import absolute
 
 from ..gaps import GapType
 
@@ -91,58 +91,82 @@ def make_mcmc_trace_gif(
 
 
 
-def plot_analysis_data(analysis_data:"AnalysisData", plotfn:str):
-    fig, ax = plt.subplots(6, 1, figsize=(5, 8))
+def plot_analysis_data(analysis_data:"AnalysisData", plotfn:str, compact=True, figsize=(5, 8)):
+    fig, ax = plt.subplots(6, 1, figsize=figsize)
     ax[0].axis("off")
     ax[0].text(
-        0.1, 0.5, analysis_data.summary, fontsize=8, verticalalignment="center"
+        0.0, 0.5, analysis_data.summary, fontsize=6, verticalalignment="center"
     )
 
-    analysis_data.hf.plot_periodogram(ax=ax[1], color="C0", alpha=1, lw=1)
-    analysis_data.psd_freqseries.plot(ax=ax[1], color="k", alpha=1, lw=1)
-    if analysis_data.highpass_fmin:
-        ax[1].set_xlim(left=analysis_data.highpass_fmin)
-    ax[1].set_xlim(right=analysis_data.freq[-1])
-    ax[1].tick_params(
+    plot_analysis_fseries(analysis_data, ax[1])
+    plot_analysis_tseries(analysis_data, ax[2])
+    plot_analysis_wdm(analysis_data, ax[3:])
+    if compact:
+        plt.subplots_adjust(hspace=0)
+    else:
+        plt.tight_layout()
+    if plotfn:
+        plt.savefig(plotfn, bbox_inches="tight")
+
+
+def plot_analysis_fseries(data:"AnalysisData", ax):
+    data.hf.plot_periodogram(ax=ax, color="C0", alpha=1, lw=1)
+    data.psd_freqseries.plot(ax=ax, color="k", alpha=1, lw=1)
+    if data.highpass_fmin:
+        ax.set_xlim(left=data.highpass_fmin)
+    ax.set_xlim(right=data.freq[-1])
+    ax.tick_params(
         axis="x",
         direction="in",
         labelbottom=False,
         top=True,
         labeltop=True,
     )
-
-    analysis_data.ht.plot(ax=ax[2])
-    kwgs = dict(show_colorbar=False, absolute=True, zscale="log")
-    kwgs2 = dict(whiten_by=analysis_data.psd_analysis.data, **kwgs)
-
-
-    data_w = analysis_data.data_wavelet
-    hwavelet = analysis_data.hwavelet
-    psd_w = analysis_data.psd_wavelet
-    if analysis_data.mask:
-        data_w = data_w * analysis_data.mask
-        hwavelet = hwavelet * analysis_data.mask
-        psd_w = psd_w * analysis_data.mask
-
-    data_w.plot(ax=ax[3], label="Data\n", **kwgs2)
-    hwavelet.plot(ax=ax[4], label="Model\n", **kwgs2)
-    if analysis_data.frange:
-        ax[4].axhline(analysis_data.frange[0], color="r", linestyle="--")
-        ax[4].axhline(analysis_data.frange[1], color="r", linestyle="--")
-
-    psd_w.plot(ax=ax[5], label="PSD\n", **kwgs)
-    if analysis_data.gaps:
-        if analysis_data.gaps.type == GapType.STITCH:
-            chunks = analysis_data.gaps._chunk_timeseries(
-                analysis_data.ht, alpha=analysis_data.alpha, fmin=analysis_data.highpass_fmin
-            )
-            chunksf = [c.to_frequencyseries() for c in chunks]
-            for i in range(len(chunks)):
-                chunksf[i].plot_periodogram(
-                    ax=ax[1], color=f"C{i + 1}", alpha=0.5
+    if data.gaps and data.gaps.type == GapType.STITCH:
+            for i, chunkf_i in enumerate(data.chunked_hf):
+                chunkf_i.plot_periodogram(
+                    ax=ax, color=f"C{i + 1}", alpha=0.5
                 )
-                chunks[i].plot(ax=ax[2], color=f"C{i + 1}", alpha=0.5)
-        for a in ax[2:]:
-            analysis_data.gaps.plot(ax=a)
-    plt.subplots_adjust(hspace=0)
-    plt.savefig(plotfn, bbox_inches="tight")
+    ax.set_ylabel("PSD [Hz$^{-1}$]")
+    ax.set_xlabel("Frequency [Hz]")
+    ax.set_yscale("log")
+    ax.set_xscale("log")
+
+
+def plot_analysis_tseries(data:"AnalysisData", ax):
+    data.ht.plot(ax=ax)
+    if data.gaps:
+        for i, chunk_i in enumerate(data.chunked_ht):
+            chunk_i.plot(ax=ax, color=f"C{i + 1}", alpha=0.5)
+    ax.set_ylabel("Strain")
+    ax.set_xlabel("Time [s]")
+    ax.set_xlim(0, data.tmax)
+
+def plot_analysis_wdm(data:"AnalysisData", axes, whiten=True):
+    kwgs_psd = dict(show_colorbar=False, absolute=True, zscale="log")
+    kwgs = dict(show_colorbar=False)
+    data_label, model_label = "Data", "Model"
+    if whiten:
+        kwgs = dict(whiten_by=data.psd_wavelet, absolute=True, **kwgs)
+        data_label = "Whitened "  + data_label
+        model_label = "Whitened " + model_label
+
+    data_w = data.data_wavelet
+    hwavelet = data.hwavelet
+    psd_w = data.psd_wavelet
+    if data.mask:
+        data_w = data_w * data.mask
+        hwavelet = hwavelet * data.mask
+        psd_w = psd_w * data.mask
+
+
+    data_w.plot(ax=axes[0], label=data_label, **kwgs)
+    hwavelet.plot(ax=axes[1], label=model_label, **kwgs)
+    psd_w.plot(ax=axes[2], label="PSD", **kwgs_psd)
+
+
+    for ax in axes:
+        for f in data.frange:
+            ax.axhline(f, color="r", linestyle="--")
+        if data.gaps:
+            data.gaps.plot(ax=ax)

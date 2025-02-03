@@ -188,7 +188,7 @@ class GapWindow:
         for i, w in enumerate(chunked_wavelets):
             # Get indices for matching time_bins with wavelet time
             stich_tmask = np.zeros(Nt, dtype=bool)
-            stich_tmask[
+            stich_tmask[ # VERY SLOW
                 np.argmin(np.abs(time_bins[:, None] - w.time), axis=0)
             ] = True
 
