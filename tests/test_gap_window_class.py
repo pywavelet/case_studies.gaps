@@ -69,3 +69,17 @@ def test_gap_window_wavelet(plot_dir):
 
 def test_repr():
     assert str(GapType.STITCH) == "STITCH"
+
+
+def test_gap_types():
+    gap_dict = {GapType.STITCH: 0, GapType.RECTANGULAR_WINDOW: 1}
+
+    assert gap_dict[GapType.STITCH] == 0, "gap_dict[GapType.STITCH] should be 0"
+    assert gap_dict[GapType.RECTANGULAR_WINDOW] == 1, "gap_dict[GapType.RECTANGULAR_WINDOW] should be 1"
+
+    ht = TimeSeries(np.sin(2 * np.pi * 200 * np.linspace(0, 1, 4096)), np.linspace(0, 1, 4096))
+
+    gap_window = GapWindow(ht.time, [(0.1, 0.2), (0.3, 0.4)], 1, type=GapType.RECTANGULAR_WINDOW)
+    gapped_ht = gap_window.gap_n_transform_timeseries(
+        ht=ht, Nf=8
+    )

@@ -72,7 +72,7 @@ def run_mcmc(
         np.random.seed(random_seed)
 
     if gap_type is not None:
-        gap_type = GapType.parse(gap_type)
+        gap_type = GapType[gap_type.upper()]
 
     analysis_data = AnalysisData(
         data_kwargs=dict(
@@ -113,10 +113,10 @@ def run_mcmc(
     else:
         logger.info(f"Starting coordinates: , {np.median(x0, axis=0)}")
         logger.info(f"true values: {true_params}")
-    nwalkers, ndim = x0.shape
+    nwalkers, ndim = x0.shapes
 
     # Check likelihood
-    llike_wdm = analysis_data.ln_posterior(true_params)
+    llike_wdm = analysis_data.lnl(true_params)
     logger.info(f"Value of likelihood[time-freq] at true values is  {llike_wdm:.3e}")
     if noise_realisation is False and not np.isclose(llike_wdm, 0.0):
         warnings.warn(

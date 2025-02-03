@@ -121,6 +121,10 @@ class AnalysisData:
         """Set up the gap window if `gap_kwargs` are provided."""
         gap_ranges = self.gap_kwargs.get("gap_ranges", [])
         gap_type = self.gap_kwargs.get("type", GapType.STITCH)
+
+        if isinstance(gap_type, str):
+            gap_type = GapType[gap_type.upper()]
+
         if gap_ranges:
             logger.info(f"Initalizing GapWindow with {gap_type} gaps ({len(gap_ranges)} gaps).")
             self.gaps = GapWindow(
@@ -311,6 +315,8 @@ class AnalysisData:
                 noise=self.noise,
                 **self.snr_dict,
             )
+            self._summary_dict["lnL@true"] = f"{self.lnl(*self.waveform_parameters)}:.2e"
+
         return self._summary_dict
 
     @property
@@ -362,7 +368,7 @@ class AnalysisData:
         ln_prior = self.log_prior(np.array(theta))
         if ln_prior == -np.inf:
             return -np.inf
-        return ln_prior + self.lnl(*theta)
+        return self.lnl(*theta)
 
 
     def freqdomain_lnl(self, *args) -> float:

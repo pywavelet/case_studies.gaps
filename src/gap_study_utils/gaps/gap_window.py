@@ -223,13 +223,16 @@ class GapWindow:
     def gap_n_transform_timeseries(
         self, ht: TimeSeries, Nf: int, alpha: float = 0.0, fmin: float = 0
     ) -> Wavelet:
-        if self.type == GapType.STITCH:
-            return self._gap_timeseries_chunk_transform_wdm_n_stitch(
-                ht, Nf, alpha, fmin
-            )
-        elif self.type == GapType.RECTANGULAR_WINDOW:
-            return self._gap_timeseries_with_0s_n_transform(
-                ht, Nf, alpha, fmin
-            )
+        gap_type_handlers = {
+            GapType.STITCH: self._gap_timeseries_chunk_transform_wdm_n_stitch,
+            GapType.RECTANGULAR_WINDOW: self._gap_timeseries_with_0s_n_transform
+        }
+
+        if self.type in gap_type_handlers:
+            return gap_type_handlers[self.type](ht, Nf, alpha, fmin)
         else:
-            raise ValueError(f"GapType {self.type} not recognized")
+            gtypes = [f"GapType[{g.type.value}] {g.type}" for g in list(gap_type_handlers.keys())]
+            raise ValueError(
+                f"GapType.[{self.type.value}] {self.type} not recognized. \n"
+                f"Dict: {gtypes} \n"
+                )

@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import Enum, auto
 from typing import List
 
 class GapType(Enum):
-    STITCH = 1
-    RECTANGULAR_WINDOW = 2
+    STITCH = auto()
+    RECTANGULAR_WINDOW = auto()
 
     def __repr__(self):
         # name without the class name
@@ -15,7 +15,6 @@ class GapType(Enum):
     @staticmethod
     def all_types() -> List["GapType"]:
         return [*GapType]
-
 
     @classmethod
     def parse(cls, value: str) -> "GapType":
