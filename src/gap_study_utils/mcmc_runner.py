@@ -61,7 +61,7 @@ def run_mcmc(
     :param tmax: Maximum time for the signal (in seconds).
     :param alpha: Alpha parameter for the windowing function.
     :param filter: Flag to apply a high-pass filter.
-    :param noise_realisation: Flag to include noise realisation.
+    :param noise: Flag to include noise realisation.
     :param n_iter: Number of iterations for the MCMC.
     :param nwalkers: Number of walkers for the MCMC.
     :param random_seedrandom_seed: Seed number for data_generation + MCMC.
@@ -127,7 +127,7 @@ def run_mcmc(
     # Check likelihood
     llike_wdm = analysis_data.lnl(*true_params)
     logger.info(f"Value of likelihood[time-freq] at true values is  {llike_wdm:.3e}")
-    if noise_realisation is False and not np.isclose(llike_wdm, 0.0):
+    if noise is False and not np.isclose(llike_wdm, 0.0):
         warnings.warn(
             f"LnL(True values) = {llike_wdm:.3e} != 0.0... SUSPICIOUS!"
         )
