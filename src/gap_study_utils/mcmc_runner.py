@@ -97,12 +97,16 @@ def run_mcmc(
         analysis_data.plot_data(plotfn=f"{outdir}/data.png")
 
 
+    # done to speed up the MCMC:
+    # make the data global allows the lnl function
+    # to access the data without passing it as an argument
+    # >> NO PICKLING / DATA PASSING TO THE POOL <<
     global DATA
     DATA = analysis_data
 
 
-    timeing_data = timeit.timeit(lambda: DATA.lnl(DATA.waveform_parameters))
-    logger.info(f"LnL timeing: {timeing_data}")
+    timing_data = timeit.repeat(lambda: DATA.lnl(*DATA.waveform_parameters), number=1, repeat=5)
+    logger.info(f"LnL timing: [{np.mean(timing_data):.4f} +/- {np.std(timing_data):.4f}]s")
 
     if true_params:
         # check that the true parameters are within the prior
@@ -118,10 +122,10 @@ def run_mcmc(
     else:
         logger.info(f"Starting coordinates: , {np.median(x0, axis=0)}")
         logger.info(f"true values: {true_params}")
-    nwalkers, ndim = x0.shapes
+    nwalkers, ndim = x0.shape
 
     # Check likelihood
-    llike_wdm = analysis_data.lnl(true_params)
+    llike_wdm = analysis_data.lnl(*true_params)
     logger.info(f"Value of likelihood[time-freq] at true values is  {llike_wdm:.3e}")
     if noise_realisation is False and not np.isclose(llike_wdm, 0.0):
         warnings.warn(
