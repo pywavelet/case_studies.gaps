@@ -61,6 +61,7 @@ class AnalysisData:
             gap_kwargs: Optional[Dict] = None,
             waveform_generator: Optional[Callable[..., TimeSeries]] = None,
             waveform_parameters: Optional[List[float]] = None,
+            parameter_ranges: Optional[List[List[float]]] = None,
             plotfn: Optional[str] = None,
     ):
         self.data_kwargs = data_kwargs or {}
@@ -74,9 +75,7 @@ class AnalysisData:
 
         if plotfn:
             _ = self.plot_data(plotfn)
-
-
-        self.priors:ProbDistContainer = construct_prior(self.waveform_parameters)
+        self.priors:ProbDistContainer = construct_prior(self.waveform_parameters, parameter_ranges)
 
         logger.info("AnalysisData initialized.")
         logger.info(self.summary)
@@ -395,15 +394,13 @@ def get_suggested_tmax(tmax:float) -> float:
     return n * DT
 
 
-def construct_prior(trues) -> ProbDistContainer:
+def construct_prior(trues, ranges=None) -> ProbDistContainer:
     ln_a, ln_f, ln_fdot = trues
-    lna_range = [ln_a - 0.1, ln_a + 0.1]
-    lnf_range = [ln_f - 0.0001, ln_f + 0.0001]
-    lnfdot_range = [ln_fdot - 0.0001, ln_fdot + 0.0001]
-    return ProbDistContainer({
-        0: uniform_dist(*lna_range),
-        1: uniform_dist(*lnf_range),
-        2: uniform_dist(*lnfdot_range)
-    })
+    if ranges is None:
+        lna_range = [ln_a - 0.1, ln_a + 0.1]
+        lnf_range = [ln_f - 0.0001, ln_f + 0.0001]
+        lnfdot_range = [ln_fdot - 0.0001, ln_fdot + 0.0001]
+        ranges = [lna_range, lnf_range, lnfdot_range]
+    return ProbDistContainer({i: uniform_dist(*r) for i, r in enumerate(ranges)})
 
 

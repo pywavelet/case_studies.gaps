@@ -5,6 +5,7 @@ format: jb-book
 root: index.md
 
 chapters:
-  - file: one_year
+  - file: one_year/one_year.md
+  - file: profile_methods.ipynb
 
 

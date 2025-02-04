@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     "pywavelet",
     "scipy>=1.10.0", #
+    "click",
     "numpy",
     "arviz",
     "eryn",

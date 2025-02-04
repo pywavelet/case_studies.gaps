@@ -6,7 +6,7 @@ from typing import List
 
 import emcee
 
-from multiprocessing import Pool
+import timeit
 
 from .analysis_data import AnalysisData
 from .constants import *
@@ -31,6 +31,7 @@ def _lnp(theta:List[float]):
 
 def run_mcmc(
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
+    param_ranges=None,
     gap_ranges=GAP_RANGES,
     gap_type="stitch",
     Nf=NF,
@@ -90,6 +91,7 @@ def run_mcmc(
         gap_kwargs=dict(type=gap_type, gap_ranges=gap_ranges),
         waveform_generator=waveform,
         waveform_parameters=true_params,
+        parameter_ranges=param_ranges,
     )
     if data_plots:
         analysis_data.plot_data(plotfn=f"{outdir}/data.png")
@@ -98,6 +100,9 @@ def run_mcmc(
     global DATA
     DATA = analysis_data
 
+
+    timeing_data = timeit.timeit(lambda: DATA.lnl(DATA.waveform_parameters))
+    logger.info(f"LnL timeing: {timeing_data}")
 
     if true_params:
         # check that the true parameters are within the prior
@@ -124,6 +129,7 @@ def run_mcmc(
         )
 
     N_cpus = cpu_count()
+    logger.info(f"Starting pool with number of CPUs: {N_cpus}")
 
     with get_context("fork").Pool(N_cpus) as pool:
         sampler = emcee.EnsembleSampler(
