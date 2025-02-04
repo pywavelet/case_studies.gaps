@@ -41,7 +41,7 @@ def run_mcmc(
     highpass_fmin=None,
     frange=None,
     tgaps=None,
-    noise_realisation=False,
+    noise=False,
     noise_curve='TDI1',
     burnin=75,
     n_iter=100,
@@ -78,7 +78,7 @@ def run_mcmc(
     analysis_data = AnalysisData(
         data_kwargs=dict(
             dt=dt,
-            noise=noise_realisation,
+            noise=noise,
             tmax=tmax,
             highpass_fmin=highpass_fmin,
             frange=frange,

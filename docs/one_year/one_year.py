@@ -4,14 +4,16 @@ from gap_study_utils.analysis_data import get_suggested_tmax
 from gap_study_utils.gaps.gap_funcs import generate_gap_ranges
 from gap_study_utils.mcmc_runner import run_mcmc
 import click
+import matplotlib.pyplot as plt
 
-from gap_study_utils.utils.noise_curves import noise_curve
+from gap_study_utils.analysis_data import AnalysisData, waveform, GapType
 
 np.random.seed(0)
 
 LN_A = np.log(1e-21)
 LN_F = np.log(0.005)
 LN_FDOT = np.log(1e-9)
+TRUES = [LN_A, LN_F, LN_FDOT]
 
 lna_range = (-48.37, -48.34)
 lnf_range = [LN_F - 2e-6, LN_F + 2e-6]
@@ -27,30 +29,20 @@ HOURS = 60 * 60
 DAYS = 24 * HOURS
 
 np.random.seed(0)
-dt = 10
-tmax = get_suggested_tmax(DAYS * 365.4)
+DT = 10
+TMAX = get_suggested_tmax(DAYS * 365.4)
 
 outdir = f"outdir_1year"
 os.makedirs(outdir, exist_ok=True)
 
-GAP_RANGES = generate_gap_ranges(tmax, gap_period=DAYS * 14, gap_duration=HOURS * 7)
+GAP_RANGES = generate_gap_ranges(TMAX, gap_period=DAYS * 14, gap_duration=HOURS * 7)
 print("Number of gaps: ", len(GAP_RANGES))
 
-KWGS = dict(
-    true_params=[LN_A, LN_F, LN_FDOT],
-    param_ranges=RANGES,
-    gap_ranges=GAP_RANGES,
-    gap_type="rectangular_window",
-    Nf=64,
-    tmax=tmax,
-    dt=dt,
-    alpha=0.0,
-    highpass_fmin=None,
-    frange=[0.005, 0.028],
-    burnin=150,
-    n_iter=200
-)
 
+GAP_KWGS = dict(
+    type=GapType.RECTANGULAR_WINDOW,
+    gap_ranges=GAP_RANGES,
+)
 
 @click.command()
 @click.option('--noise_realisation', is_flag=True)
@@ -62,11 +54,38 @@ def main(noise_realisation, noise_curve):
     run_outdir = f"{outdir}/mcmc_{label}"
     os.makedirs(run_outdir, exist_ok=True)
 
-    run_mcmc(
-        **KWGS,
-        noise_realisation=noise_realisation,
-        outdir=run_outdir,
+    data_kwargs = dict(
+        dt=DT,
+        noise=noise_realisation,
+        tmax=TMAX,
         noise_curve=noise_curve,
+        Nf=64,
+        alpha=0.0,
+        highpass_fmin=None,
+        frange=[0.005, 0.028],
+    )
+
+
+    data = AnalysisData(
+        data_kwargs=data_kwargs,
+        gap_kwargs=GAP_KWGS,
+        waveform_generator=waveform,
+        waveform_parameters=TRUES,
+        parameter_ranges=RANGES,
+    );
+
+    # %%
+    fig, ax = plt.subplots(1, 1, figsize=(12, 3.3))
+    fig, _ = data.data_wavelet.plot(ax=ax, whiten_by=None, freq_range=[0.005, 0.028])
+    fig.savefig(os.path.join(outdir, "data_wavelet.png"), bbox_inches="tight")
+
+    run_mcmc(
+        **data_kwargs,
+        outdir=run_outdir,
+        true_params=TRUES,
+        param_ranges=RANGES,
+        burnin=150,
+        n_iter=250,
     )
 
 

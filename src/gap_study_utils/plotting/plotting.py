@@ -52,26 +52,32 @@ def plot_mcmc_summary(idata, analysis_data: "AnalysisData", i=None, fname=None, 
     fig, axes = plt.subplots(4, 2, figsize=(10, 10))
     fig.suptitle(f"Iteration {i}" + f" [{extra_info}]")
     plot_trace(idata, axes, i, max_iter, trues=analysis_data.waveform_parameters)
-    analysis_data.data_wavelet.plot(
-        ax=axes[3, 0],
-        show_colorbar=False,
-        label="Whiten Data\n",
-        whiten_by=analysis_data.psd_analysis.data,
-        absolute=True,
-        zscale="log",
-    )
-    htemplate.plot(
-        ax=axes[3, 1],
-        show_colorbar=False,
-        label="ith-sample Signal\n",
-        absolute=True,
-        zscale="log",
-    )
-    if frange:
-        axes[3, 0].axhline(frange[0], c="red", linestyle="--")
-        axes[3, 0].axhline(frange[1], c="red", linestyle="--")
-        axes[3, 1].axhline(frange[0], c="red", linestyle="--")
-        axes[3, 1].axhline(frange[1], c="red", linestyle="--")
+
+    try:
+        analysis_data.data_wavelet.plot(
+            ax=axes[3, 0],
+            show_colorbar=False,
+            label="Whiten Data\n",
+            whiten_by=analysis_data.psd_analysis.data,
+            absolute=True,
+            zscale="log",
+        )
+        htemplate.plot(
+            ax=axes[3, 1],
+            show_colorbar=False,
+            label="ith-sample Signal\n",
+            absolute=True,
+            zscale="log",
+        )
+        if frange:
+            axes[3, 0].axhline(frange[0], c="red", linestyle="--")
+            axes[3, 0].axhline(frange[1], c="red", linestyle="--")
+            axes[3, 1].axhline(frange[0], c="red", linestyle="--")
+            axes[3, 1].axhline(frange[1], c="red", linestyle="--")
+    except Exception as e:
+        print(e)
+
+
     if fname:
         plt.tight_layout()
         plt.savefig(fname)

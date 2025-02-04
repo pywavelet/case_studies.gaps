@@ -10,7 +10,7 @@ def test_mcmc(plot_dir):
     # study/Wavelet_Domain/nan_method/mcmc.py
     kwgs = dict(
         true_params=TRUES,
-        noise_realisation=True,
+        noise=True,
         alpha=0.1,
         highpass_fmin=0.0001,
         dt=DT,
