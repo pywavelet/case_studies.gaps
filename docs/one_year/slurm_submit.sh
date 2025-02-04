@@ -5,7 +5,7 @@
 #SBATCH --error=/fred/oz980/avajpeyi/projects/pywavelet/gaps_study/docs/one_year/logs/job_%A_%a.err
 #SBATCH --time=00:20:00
 #SBATCH --array=0-3
-#SBATCH --mem=6G
+#SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
 
 ml python-scientific/3.11.3-foss-2023a
