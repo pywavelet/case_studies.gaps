@@ -3,7 +3,7 @@
 #SBATCH --job-name=one_year_lisa
 #SBATCH --output=/fred/oz980/avajpeyi/projects/pywavelet/gaps_study/docs/one_year/logs/job_%A_%a.out
 #SBATCH --error=/fred/oz980/avajpeyi/projects/pywavelet/gaps_study/docs/one_year/logs/job_%A_%a.err
-#SBATCH --time=00:20:00
+#SBATCH --time=00:24:00
 #SBATCH --array=0-3
 #SBATCH --mem=16G
 #SBATCH --cpus-per-task=4
