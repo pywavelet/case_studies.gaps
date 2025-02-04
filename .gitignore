@@ -1,3 +1,9 @@
+logs
+*.out
+*.err
+
+
+
 # Data directories
 examples/Noise/Gaps/study/Wavelet_Domain/nan_method/matrix_directory
 *.npy
