@@ -336,7 +336,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -352,6 +354,15 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#case-1">Case 1:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#case-2">Case 2:</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -363,6 +374,35 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="one-year-lisa-data-analysis">
 <h1>One Year LISA data analysis<a class="headerlink" href="#one-year-lisa-data-analysis" title="Permalink to this heading">#</a></h1>
+<p><img alt="" src="../_images/data_wavelet.png" /></p>
+<section id="case-1">
+<h2>Case 1:<a class="headerlink" href="#case-1" title="Permalink to this heading">#</a></h2>
+<p>A pure rectangular function for the gaps.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>TDI1</p></th>
+<th class="head"><p>TDI2</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>No noise</p></td>
+<td><p><img alt="corner_TDI1" src="../_images/corner.png" /></p></td>
+<td><p><img alt="corner_TDI2" src="../_images/corner1.png" /></p></td>
+</tr>
+<tr class="row-odd"><td><p>With noise</p></td>
+<td><p><img alt="corner_TDI1_noise" src="../_images/corner2.png" /></p></td>
+<td><p><img alt="corner_TDI2_noise" src="../_images/corner3.png" /></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="case-2">
+<h2>Case 2:<a class="headerlink" href="#case-2" title="Permalink to this heading">#</a></h2>
+<p>Smooth taper for the gaps with lobe-lengths appox 2 hours set by some alpha parameter (using a tukey window).
+This will reduce artifacts appearing through leakage.
+Can you taper the end points of the data stream as well?</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -419,6 +459,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#case-1">Case 1:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#case-2">Case 2:</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
