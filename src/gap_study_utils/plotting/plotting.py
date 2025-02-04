@@ -147,7 +147,7 @@ def plot_analysis_wdm(data:"AnalysisData", axes, whiten=True):
     kwgs = dict(show_colorbar=False)
     data_label, model_label = "Data", "Model"
     if whiten:
-        kwgs = dict(whiten_by=data.psd_wavelet, absolute=True, **kwgs)
+        kwgs = dict(whiten_by=data.psd_wavelet.data, absolute=True, **kwgs)
         data_label = "Whitened "  + data_label
         model_label = "Whitened " + model_label
 
