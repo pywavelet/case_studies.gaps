@@ -14,9 +14,14 @@ LN_F = np.log(0.005)
 LN_FDOT = np.log(1e-9)
 
 lna_range = (-48.37, -48.34)
-lnf_range = ((i * 1e-6) - 5.29831 for i in (-4.3, -3.7))
-lnfdot_range = ((i * 1e-6) - 2.07232e1 for i in (-66.5, -65.5))
+lnf_range = [LN_F - 2e-6, LN_F + 2e-6]
+lnfdot_range =[LN_FDOT - 2e-6, LN_FDOT + 2e-6]
 RANGES = [lna_range, lnf_range, lnfdot_range]
+
+# assert taht the true values are within the ranges
+assert lna_range[0] < LN_A < lna_range[1], f"{lna_range[0]} < {LN_A} < {lna_range[1]}"
+assert lnf_range[0] < LN_F < lnf_range[1], f"{lnf_range[0]} < {LN_F} < {lnf_range[1]}"
+assert lnfdot_range[0] < LN_FDOT < lnfdot_range[1], f"{lnfdot_range[0]} < {LN_FDOT} < {lnfdot_range[1]}"
 
 HOURS = 60 * 60
 DAYS = 24 * HOURS
