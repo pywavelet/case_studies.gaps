@@ -364,23 +364,30 @@ class AnalysisData:
         )
 
     def ln_posterior(self, theta:List[float]) -> float:
-        ln_prior = self.log_prior(np.array(theta))
-        if ln_prior == -np.inf:
+        if self.log_prior(np.array(theta)) == -np.inf:
             return -np.inf
         return self.lnl(*theta)
+
+    def freqdomain_lnp(self, theta:List[float]) -> float:
+        if self.log_prior(np.array(theta)) == -np.inf:
+            return -np.inf
+        return self.freqdomain_lnl(*theta)
 
 
     def freqdomain_lnl(self, *args) -> float:
         ht = self.waveform_generator(*args, t=self.time)
+        d = self.data_timeseries
         # if self.highpass_fmin:
         #     ht = ht.highpass_filter(self.highpass_fmin, self.alpha)
         if self.gaps is not None:
             ht.data[self.gaps.gap_bools] = 0
+            d.data[self.gaps.gap_bools] = 0
         signal_f = ht.to_frequencyseries().data
+        data_f = d.to_frequencyseries().data
         variance_noise_f = (
                 self.ND * self.psd_freqseries.data / (4 * self.dt)
         )  # Calculate variance of noise, real and imaginary.
-        inn_prod = sum((abs(self.data_frequencyseries.data - signal_f) ** 2) / variance_noise_f)
+        inn_prod = sum((abs(data_f - signal_f) ** 2) / variance_noise_f)
         return -0.5 * inn_prod
 
 

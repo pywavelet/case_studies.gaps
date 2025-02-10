@@ -151,13 +151,18 @@ def main_gaps(N_points=50, filtering=False):
 
     lnls = calculate_lnls(clean_data, ln_a_range)
     lnls_noisy = calculate_lnls(noisy_data, ln_a_range)
+
+    lnls_f = calculate_lnls(clean_data, ln_a_range, freq_domain=True)
+    lnls_f_noisy = calculate_lnls(noisy_data, ln_a_range, freq_domain=True)
+
     fname = f"{OUTDIR}/lnL_vs_lnA_gaps.png"
     if filtering:
         fname = fname.replace(".png", "_filtered.png")
-    plot_lnL_vs_lnA(ln_a_range, lnls, lnls_noisy, fname=fname)
+    plot_lnL_vs_lnA(ln_a_range, lnls, lnls_noisy, fname=fname, lnls_f=lnls_f, lnls_f_noisy=lnls_f_noisy)
+
 
 
 if __name__ == "__main__":
-    main_just_noise()
+    # main_just_noise()
     main_gaps(filtering=True)
     main_gaps(filtering=False)

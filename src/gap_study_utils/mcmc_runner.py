@@ -21,13 +21,16 @@ from . import logger
 from .utils.io import save_chains_as_idata
 
 
-
+FREQ_DOMAIN_ANALYSIS = False
 
 # make data global
 DATA:AnalysisData = None
 
 def _lnp(theta:List[float]):
+    if FREQ_DOMAIN_ANALYSIS:
+        return DATA.freqdomain_lnp(theta)
     return DATA.ln_posterior(theta)
+
 
 def run_mcmc(
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
@@ -103,6 +106,9 @@ def run_mcmc(
     # >> NO PICKLING / DATA PASSING TO THE POOL <<
     global DATA
     DATA = analysis_data
+
+    global FREQ_DOMAIN_ANALYSIS
+    FREQ_DOMAIN_ANALYSIS = frequency_domain_analysis
 
 
     timing_data = timeit.repeat(lambda: DATA.lnl(*DATA.waveform_parameters), number=1, repeat=5)

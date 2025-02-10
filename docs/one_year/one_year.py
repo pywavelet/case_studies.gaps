@@ -56,9 +56,11 @@ KWGS = dict(
 @click.command()
 @click.option('--noise_realisation', is_flag=True)
 @click.option('--noise_curve', default='TDI1')
-def main(noise_realisation, noise_curve):
+@click.option('--fdomain', is_flag=True)
+def main(noise_realisation, noise_curve, fdomain):
     label = "no_noise_" if not noise_realisation else "noise_"
     label += noise_curve
+    label += "_fdomain" if fdomain else label
     print(f"Running MCMC for {label}")
     run_outdir = f"{outdir}/mcmc_{label}"
     os.makedirs(run_outdir, exist_ok=True)
@@ -68,6 +70,7 @@ def main(noise_realisation, noise_curve):
         noise=noise_realisation,
         noise_curve=noise_curve,
         outdir=run_outdir,
+        frequency_domain_analysis=fdomain
     )
 
 
