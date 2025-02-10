@@ -1,6 +1,6 @@
 python one_year.py --noise_curve 'TDI1'
 python one_year.py --noise_curve 'TDI2'
-python one_year.py --noise_curve 'TDI1'
+python one_year.py --noise_curve 'TDI1' --noise_realisation
 python one_year.py --noise_curve 'TDI2' --noise_realisation
 python one_year.py --noise_curve 'TDI1' --fdomain
 python one_year.py --noise_curve 'TDI1' --fdomain  --noise_realisation
