@@ -396,9 +396,9 @@ def round_to_nearest_pow_of_2(n: int) -> int:
     return 2 ** int(np.log2(n))
 
 
-def get_suggested_tmax(tmax:float) -> float:
-    n = round_to_nearest_pow_of_2(tmax / DT)
-    return n * DT
+def get_suggested_tmax(tmax:float, dt:float=DT) -> float:
+    n = round_to_nearest_pow_of_2(tmax / dt)
+    return n * dt
 
 
 def construct_prior(trues, ranges=None) -> ProbDistContainer:
