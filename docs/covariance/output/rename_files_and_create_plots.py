@@ -50,7 +50,7 @@ markdown_table = f"{table_header}\n{table_content}"
 
 # Save the markdown table to a file
 with open('summary.md', 'w') as f:
-    f.write("# Noise Correlation\n")
+    markdown_table = "# Noise Correlation\n" + markdown_table
     f.write(markdown_table)
 
 print("Markdown summary created successfully.")

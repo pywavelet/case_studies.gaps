@@ -410,4 +410,3 @@ def construct_prior(trues, ranges=None) -> ProbDistContainer:
         ranges = [lna_range, lnf_range, lnfdot_range]
     return ProbDistContainer({i: uniform_dist(*r) for i, r in enumerate(ranges)})
 
-

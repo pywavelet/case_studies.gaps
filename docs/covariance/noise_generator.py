@@ -104,6 +104,14 @@ class NoiseGenerator:
             s += f" with gap"
         return s
 
+    def label(self, no_special_char:bool=False):
+        s = str(self)
+        if no_special_char:
+            s = s.replace(" ", "_").replace("(", "").replace(")", "").replace(",", "")
+            s = s.replace("=", "").replace("{", "").replace("}", "")
+        return s
+
+
 
 if __name__ == '__main__':
     noise_generator1 = NoiseGenerator()

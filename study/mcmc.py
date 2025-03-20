@@ -11,14 +11,15 @@ import numpy as np
 from gap_study_utils.plotting import plot_corner
 from gap_study_utils.constants import TRUES
 
+OUTDIR = "out_mcmc_Cornish"
 FNAMES = {
-    "basic": "out_mcmc/basic/emcee_chain.nc",
-    "basic_fd": "out_mcmc/basic_fd/emcee_chain.nc",
-    "noise_fd": "out_mcmc/noise_fd/emcee_chain.nc",
-    "gap": "out_mcmc/gap/emcee_chain.nc",
-    "noise": "out_mcmc/noise/emcee_chain.nc",
-    "gap+noise": "out_mcmc/gap+noise/emcee_chain.nc",
-    "gap+noise+filtering": "out_mcmc/gap+noise+filtering/emcee_chain.nc",
+    "basic": f"{OUTDIR}/basic/emcee_chain.nc",
+    "basic_fd": f"{OUTDIR}/basic_fd/emcee_chain.nc",
+    "noise_fd": f"{OUTDIR}/noise_fd/emcee_chain.nc",
+    "gap": f"{OUTDIR}/gap/emcee_chain.nc",
+    "noise": f"{OUTDIR}/noise/emcee_chain.nc",
+    "gap+noise": f"{OUTDIR}/gap+noise/emcee_chain.nc",
+    "gap+noise+filtering": f"{OUTDIR}/gap+noise+filtering/emcee_chain.nc",
 }
 
 CORNER_KWGS = dict(
@@ -30,7 +31,7 @@ CORNER_KWGS = dict(
 
 np.random.seed(1234)
 
-OUTDIR = "out_mcmc"
+
 os.makedirs(OUTDIR, exist_ok=True)
 NITER = 250
 DT = 20
@@ -47,20 +48,22 @@ common_kwgs = dict(
     frange=[0.002, 0.007],
     true_params=[LN_A_TRUE, LN_F_TRUE, LN_FDOT_TRUE],
     random_seed=0,
+    Nf=16,
+    noise_curve="TDI1"
 )
 
 
 def main_freq_domain_mcmc():
     run_mcmc(
         gap_ranges=None,
-        noise_realisation=True,
+        noise=True,
         outdir=f"{OUTDIR}/noise_fd",
         frequency_domain_analysis=True,
         **common_kwgs
     )
     run_mcmc(
         gap_ranges=None,
-        noise_realisation=False,
+        noise=False,
         outdir=f"{OUTDIR}/basic_fd",
         frequency_domain_analysis=True,
         **common_kwgs
@@ -70,50 +73,35 @@ def main_freq_domain_mcmc():
 def main_non_gaps():
     run_mcmc(
         gap_ranges=None,
-        noise_realisation=True,
+        noise=True,
         outdir=f"{OUTDIR}/noise",
         **common_kwgs
     )
     run_mcmc(
         gap_ranges=None,
-        noise_realisation=False,
+        noise=False,
         outdir=f"{OUTDIR}/basic",
         **common_kwgs,
     )
 
 
 def main_wdm_domain_mcmc():
-    # run_mcmc(
-    #     gap_ranges=GAPS,
-    #     noise_realisation=False,
-    #     outdir=f"{OUTDIR}/gap",
-    #     **common_kwgs
-    # )
-    #
-    # run_mcmc(
-    #     gap_ranges=GAPS,
-    #     noise_realisation=True,
-    #     outdir=f"{OUTDIR}/gap+noise",
-    #     **common_kwgs
-    # )
     run_mcmc(
         gap_ranges=GAPS,
-        noise_realisation=True,
-        outdir=f"{OUTDIR}/gap+noise+filtering",
-        alpha=0.2,
-        highpass_fmin=1e-4,  # * F_TRUE / 4,
+        noise=False,
+        outdir=f"{OUTDIR}/gap",
+        **common_kwgs
+    )
+
+    run_mcmc(
+        gap_ranges=GAPS,
+        noise=True,
+        outdir=f"{OUTDIR}/gap+noise",
         **common_kwgs
     )
 
 
-def main_wdm_with_masks():
-    run_mcmc(
-        gap_ranges=GAPS,
-        noise_realisation=True,
-        outdir=f"{OUTDIR}/gap+noise+mask",
-        tgaps=[[0, 300], [TMAX * 0.47, TMAX * 0.52], [TMAX-300, TMAX]],
-        **common_kwgs
-    )
+
 
 def make_all_corners():
     fig = plot_corner(
@@ -146,16 +134,11 @@ def make_all_corners():
     )
     fig.savefig("corner_gap.png")
 
-    fig = plot_corner(
-        idata_fnames=[FNAMES["gap"],  FNAMES["gap+noise+filtering"]],
-        chainLabels=["Gap", "Gap+noise+filtering"],
-        **CORNER_KWGS
-    )
-    fig.savefig("corner_gap_filtering.png")
 
 
 if __name__ == "__main__":
     # main_freq_domain_mcmc()
-    main_wdm_domain_mcmc()
+    # main_wdm_domain_mcmc()
+    # main_non_gaps()
     # main_wdm_with_masks()
     make_all_corners()

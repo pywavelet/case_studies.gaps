@@ -20,6 +20,12 @@ class CovarianceEstimator:
         self.n_samples = n_samples
         self.cov_matrix = cov_matrix
 
+    @property
+    def correlation_matrix(self):
+        if not hasattr(self, '_correlation_matrix'):
+            self._correlation_matrix = self.covariance_to_correlation(self.cov_matrix)
+        return self._correlation_matrix
+
     @classmethod
     def from_generator(cls, noise_generator: Callable[[int], np.ndarray], n_samples=5000):
         """
@@ -82,6 +88,7 @@ class CovarianceEstimator:
 
     @staticmethod
     def plot_matrix(matrix, title="Matrix", xlabel="Index", ylabel="Index", cmap='viridis', ax=None, logscale=None,
+                    show_colorbar=True,
                     **kwargs):
         """
         Plot a matrix as a heatmap.
@@ -101,6 +108,7 @@ class CovarianceEstimator:
         """
         if ax is None:
             fig, ax = plt.subplots()
+        fig = ax.get_figure()
 
         if logscale is None:
             # detect if logscale is needed
@@ -113,10 +121,24 @@ class CovarianceEstimator:
 
         im = ax.imshow(matrix, cmap=cmap, interpolation='none', norm=norm, **kwargs)
         # add colorbar to right of axis
-        plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+        if show_colorbar:
+            plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
         ax.set_title(title)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+        return fig, ax
+
+
+    @property
+    def avg_abs_off_correlation(self):
+        corr_matrix = self.correlation_matrix
+        total_abs_correlation = np.sum(np.abs(corr_matrix)) - np.trace(np.abs(corr_matrix))
+        n = corr_matrix.shape[0]
+        average_abs_correlation = total_abs_correlation / (n * (n - 1))
+        return average_abs_correlation
+
+
+
 
     def plot_covariance(self, title="Covariance Matrix", ax=None):
         """
@@ -127,10 +149,10 @@ class CovarianceEstimator:
         title : str, optional
             Title for the covariance plot.
         """
-        self.plot_matrix(self.cov_matrix, title=title, xlabel="Feature index", ylabel="Feature index", cmap='viridis',
+        return self.plot_matrix(self.cov_matrix, title=title, xlabel="Feature index", ylabel="Feature index", cmap='viridis',
                          ax=ax)
 
-    def plot_correlation(self, title="Correlation Matrix", ax=None):
+    def plot_correlation(self, title="Correlation Matrix", ax=None, show_colorbar=True):
         """
         Compute the correlation matrix from the estimated covariance matrix and plot it.
 
@@ -139,9 +161,9 @@ class CovarianceEstimator:
         title : str, optional
             Title for the correlation plot.
         """
-        corr_matrix = self.covariance_to_correlation(self.cov_matrix)
-        self.plot_matrix(corr_matrix, title=title, xlabel="Feature index", ylabel="Feature index", cmap='coolwarm',
-                         vmin=-1, vmax=1, ax=ax)
+        corr_matrix = self.correlation_matrix
+        return self.plot_matrix(corr_matrix, title=title, xlabel="Feature index", ylabel="Feature index", cmap='coolwarm',
+                         vmin=-1, vmax=1, ax=ax, show_colorbar=show_colorbar)
 
     def save(self, filename):
         """
@@ -185,3 +207,4 @@ if __name__ == "__main__":
 
     estimator = CovarianceEstimator.from_generator(example_noise_generator, n_samples=5000)
     estimator.plot('test.png')
+    print(estimator.avg_abs_off_correlation)
